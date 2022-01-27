@@ -1,0 +1,49 @@
+{
+  "title": "GT_AND_LT_No_Overlap",
+  "input": {
+    "WHERE": {
+      "OR": [
+        {
+          "AND": [
+            {
+              "GT": {
+                "courses_avg": 6
+              }
+            },
+            {
+              "LT": {
+                "courses_avg": 5
+              }
+            }
+          ]
+        },
+        {
+          "EQ": {
+            "courses_avg": 98
+          }
+        }
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept",
+        "courses_id",
+        "courses_avg"
+      ],
+      "ORDER": "courses_avg"
+    }
+  },
+  "errorExpected": false,
+  "expected": [
+    {
+      "courses_dept": "crwr",
+      "courses_id": "599",
+      "courses_avg": 98
+    },
+    {
+      "courses_dept": "crwr",
+      "courses_id": "599",
+      "courses_avg": 98
+    }
+  ]
+}

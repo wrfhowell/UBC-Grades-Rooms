@@ -1,0 +1,38 @@
+{
+  "title": "Is_Should_Only_Have_One_Key_Throws_InsightError",
+  "input": {
+    "WHERE": {
+      "AND": [{
+
+
+        "IS": {
+          "courses_dept": "*"
+        }
+      },
+        {
+          "IS" : {
+            "courses_dept" : "math"
+          }
+        }
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_title",
+        "courses_uuid",
+        "courses_dept",
+        "courses_avg",
+        "courses_pass",
+        "courses_fail",
+        "courses_audit",
+        "courses_year",
+        "courses_instructor",
+        "courses_id"
+
+      ],
+      "ORDER": "courses_dept"
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}

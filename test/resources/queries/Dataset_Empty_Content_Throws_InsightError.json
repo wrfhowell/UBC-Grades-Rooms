@@ -1,0 +1,20 @@
+{
+  "title" : "Dataset_Empty_Content_Throws_InsightError",
+  "input" : {
+    "WHERE": {
+      "GT": {
+        "coursesNull_avg":97
+      }
+    },
+    "OPTIONS":{
+      "COLUMNS":[
+        "coursesNull_dept",
+        "coursesNull_avg"
+      ],
+      "ORDER":"coursesNull_avg"
+    }
+  },
+  "errorExpected" : true,
+  "expected" : "InsightError"
+}
+

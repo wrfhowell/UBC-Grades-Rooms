@@ -1,0 +1,38 @@
+{
+  "title": "NOT_Must_Be_Followed_By_Filter",
+  "input": {
+    "WHERE": {
+      "AND": [
+        {
+          "AND": [
+            {
+              "NOT": {
+                "courses_dept": "orange"
+              }
+            },
+            {
+              "NOT": {
+                "courses_dept": "math"
+              }
+            }
+          ]
+        },
+        {
+          "GT": {
+            "courses_avg": 97
+          }
+        }
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept",
+        "courses_id",
+        "courses_avg"
+      ],
+      "ORDER": "courses_avg"
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}

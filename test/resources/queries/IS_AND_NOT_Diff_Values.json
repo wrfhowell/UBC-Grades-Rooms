@@ -1,0 +1,62 @@
+{
+  "title": "IS_AND_NOT_DIFF_Values",
+  "input": {
+    "WHERE": {
+      "OR": [
+        {
+          "AND": [
+            {
+              "NOT": {
+                "GT": {
+                  "courses_avg": 5
+                }
+              }
+            },
+            {
+              "IS": {
+                "courses_dept": "fopr"
+              }
+            }
+          ]
+        },
+        {
+          "GT": {
+            "courses_avg": 99
+          }
+        }
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept",
+        "courses_id",
+        "courses_avg"
+      ],
+      "ORDER": "courses_avg"
+    }
+  },
+  "errorExpected": false,
+  "expected":
+  [
+      {
+        "courses_dept": "fopr",
+        "courses_id": "362",
+        "courses_avg": 4.5
+      },
+      {
+        "courses_dept": "cnps",
+        "courses_id": "574",
+        "courses_avg": 99.19
+      },
+      {
+        "courses_dept": "math",
+        "courses_id": "527",
+        "courses_avg": 99.78
+      },
+      {
+        "courses_dept": "math",
+        "courses_id": "527",
+        "courses_avg": 99.78
+      }
+    ]
+  }

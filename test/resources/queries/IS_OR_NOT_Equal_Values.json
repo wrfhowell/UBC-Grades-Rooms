@@ -1,0 +1,40 @@
+{
+  "title": "IS_OR_NOT_Equal_Values",
+  "input": {
+    "WHERE": {
+      "OR": [
+        {
+          "OR": [
+            {
+              "NOT": {
+                "IS": {
+                  "courses_dept": "fopr"
+                }
+              }
+            },
+            {
+              "IS": {
+                "courses_dept": "fopr"
+              }
+            }
+          ]
+        },
+        {
+          "GT": {
+            "courses_avg": 99
+          }
+        }
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept",
+        "courses_id",
+        "courses_avg"
+      ],
+      "ORDER": "courses_avg"
+    }
+  },
+  "errorExpected": true,
+  "expected": "ResultTooLargeError"
+}
