@@ -4,7 +4,7 @@ import {
 	InsightDatasetKind,
 	InsightError,
 	InsightResult,
-	NotFoundError
+	NotFoundError,
 } from "./IInsightFacade";
 
 /**
@@ -13,6 +13,9 @@ import {
  *
  */
 export default class InsightFacade implements IInsightFacade {
+	// updated after addDataset adds a dataset
+	public addedDatasets: InsightDataset[] = [];
+
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
 	}
@@ -30,6 +33,6 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
-		return Promise.reject("Not implemented.");
+		return Promise.resolve(this.addedDatasets);
 	}
 }
