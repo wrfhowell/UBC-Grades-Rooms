@@ -1,6 +1,5 @@
-import {AbstractSyntaxQueryTree} from "./AbstractSyntaxQueryTree";
 import {InsightError, ResultTooLargeError} from "./IInsightFacade";
-import {Where} from "./Where";
+
 
 export class Validation {
 	private type = "";
