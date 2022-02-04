@@ -1,0 +1,79 @@
+{
+  "title": "Two_IS_OR",
+  "input": {
+    "WHERE": {
+      "AND": [
+        {
+          "OR": [
+            {
+              "IS": {
+                "courses_dept": "orange"
+              }
+            },
+            {
+              "IS": {
+                "courses_dept": "math"
+              }
+            }
+          ]
+        },
+        {
+          "GT": {
+            "courses_avg": 97
+          }
+        }
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept",
+        "courses_id",
+        "courses_avg"
+      ],
+      "ORDER": "courses_avg"
+    }
+  },
+  "errorExpected": false,
+  "expected": [
+    {
+      "courses_dept": "math",
+      "courses_id": "541",
+      "courses_avg": 97.09
+    },
+    {
+      "courses_dept": "math",
+      "courses_id": "541",
+      "courses_avg": 97.09
+    },
+    {
+      "courses_dept": "math",
+      "courses_id": "525",
+      "courses_avg": 97.25
+    },
+    {
+      "courses_dept": "math",
+      "courses_id": "525",
+      "courses_avg": 97.25
+    },
+    {
+      "courses_dept": "math",
+      "courses_id": "532",
+      "courses_avg": 97.48
+    },
+    {
+      "courses_dept": "math",
+      "courses_id": "532",
+      "courses_avg": 97.48
+    },
+    {
+      "courses_dept": "math",
+      "courses_id": "527",
+      "courses_avg": 99.78
+    },
+    {
+      "courses_dept": "math",
+      "courses_id": "527",
+      "courses_avg": 99.78
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "title": "Is_Must_Be_Object_Throws_InsightError",
+  "input": {
+    "WHERE": {
+      "OR": [
+        {
+          "AND": [
+            {
+              "GT": {
+                "courses_avg": 90
+              }
+            },
+            {
+              "IS": [
+                {
+                  "courses_dept": "adhe"
+                }
+              ]
+            },
+            {
+              "NOT": {
+                "GT": {
+                  "courses_avg": 90.2
+                }
+              }
+            }
+          ]
+        },
+        {
+          "LT": {
+            "courses_avg": 20
+          }
+        }
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept",
+        "courses_id",
+        "courses_avg"
+      ],
+      "ORDER": "courses_avg"
+    }
+  },
+  "errorExpected" : true,
+  "expected" : "InsightError"
+}
