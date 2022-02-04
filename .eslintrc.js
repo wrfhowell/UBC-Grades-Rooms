@@ -96,7 +96,7 @@ module.exports = {
 		"no-unused-vars": "off",
 		"no-var": "error",
 		"prefer-const": "off",
-		"quote-props": ["error", "consistent"],
+		"quote-props": ["error",  "consistent-as-needed"],
 		"quotes": ["error", "double", {"avoidEscape": true}],
 		"radix": "error",
 		"semi": "error",

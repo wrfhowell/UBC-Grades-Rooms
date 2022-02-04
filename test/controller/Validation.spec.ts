@@ -24,36 +24,36 @@ let ExecutionObject = new Execution();
 describe("Validation", function () {
 	it("Should return True - complex query", function() {
 		let x = {
-			"WHERE": {
-				"OR": [
+			WHERE: {
+				OR: [
 					{
-						"AND": [
+						AND: [
 							{
-								"GT": {
-									"courses_avg": 90
+								GT: {
+									courses_avg: 90
 								}
 							},
 							{
-								"IS": {
-									"courses_dept": "adhe"
+								IS: {
+									courses_dept: "adhe"
 								}
 							}
 						]
 					},
 					{
-						"EQ": {
-							"courses_avg": 95
+						EQ: {
+							courses_avg: 95
 						}
 					}
 				]
 			},
-			"OPTIONS": {
-				"COLUMNS": [
+			OPTIONS: {
+				COLUMNS: [
 					"courses_dept",
 					"courses_id",
 					"courses_avg"
 				],
-				"ORDER": "courses_avg"
+				ORDER: "courses_avg"
 			}
 		};
 		let result = ValidationObject.Validate(x);
@@ -62,17 +62,17 @@ describe("Validation", function () {
 
 	it("Should return True - simple query", function() {
 		let x = {
-			"WHERE": {
-				"GT": {
-					"courses_avg": 97
+			WHERE: {
+				GT: {
+					courses_avg: 97
 				}
 			},
-			"OPTIONS": {
-				"COLUMNS": [
+			OPTIONS: {
+				COLUMNS: [
 					"courses_dept",
 					"courses_avg"
 				],
-				"ORDER": "courses_avg"
+				ORDER: "courses_avg"
 			}
 		};
 		let result = ValidationObject.Validate(x);
@@ -82,13 +82,13 @@ describe("Validation", function () {
 	describe("ValidateWhere", function () {
 
 		it("Should return true if Where Statement is correct", function () {
-			let x = {"WHERE": {}};
+			let x = {WHERE: {}};
 			let result = ValidationObject.ValidateWhere(x);
 			expect(result).to.be.true;
 		});
 
 		it("Should return true if Filters Statement is correct", function () {
-			let x = {"WHERE": {"GT": {"courses_avg": 80}}};
+			let x = {WHERE: {GT: {courses_avg: 80}}};
 			let result = ValidationObject.ValidateWhere(x);
 			expect(result).to.be.true;
 		});
@@ -115,7 +115,7 @@ describe("Validation", function () {
 
 		describe("ValidateLogicComparison", function() {
 			it("Should return True - correct Filters", function() {
-				let x = {"OR": [{"GT": {"courses_avg": 80}},{"LT": {"courses_avg": 85}}]};
+				let x = {OR: [{GT: {courses_avg: 80}},{LT: {courses_avg: 85}}]};
 				let result = ValidationObject.ValidateLogicComparison(x);
 				expect(result).to.be.true;
 			});
@@ -124,14 +124,14 @@ describe("Validation", function () {
 		describe("ValidateSComparison", function() {
 
 			it("Should return True - correct IS clause", function() {
-				let obj = {"IS": {"courses_dept": "math"}};
+				let obj = {IS: {courses_dept: "math"}};
 				let x = ValidationObject.ValidateSComparison(obj);
 				console.log("result:" + x);
 				expect(x).to.be.true;
 			});
 
 			it("Should return False - wrong Skey", function() {
-				let obj = {"IS": {"courses__dept": "math"}};
+				let obj = {IS: {courses__dept: "math"}};
 				let x = ValidationObject.ValidateSComparison(obj);
 				expect(x).to.be.false;
 			});
@@ -163,13 +163,13 @@ describe("Validation", function () {
 
 		describe("ValidateMComparison", function() {
 			it("Should return True - GT", function() {
-				let x = {"GT" : {"courses_avg" : 80}};
+				let x = {GT : {courses_avg : 80}};
 				let result = ValidationObject.ValidateMComparison(x);
 				expect(result).to.be.true;
 			});
 
 			it("Should return True - LT", function() {
-				let x = {"LT" : {"courses_avg" : 85}};
+				let x = {LT : {courses_avg : 85}};
 				let result = ValidationObject.ValidateMComparison(x);
 				expect(result).to.be.true;
 			});
@@ -200,13 +200,13 @@ describe("Validation", function () {
 		describe("ValidateNegation", function() {
 
 			it("Should return True", function() {
-				let x = {"NOT": {"GT": {"courses_avg": 80}}};
+				let x = {NOT: {GT: {courses_avg: 80}}};
 				let result = ValidationObject.ValidateNegation(x);
 				expect(result).to.be.true;
 			});
 
 			it("Should NOT return True - wrong NOT", function() {
-				let x = {"NOTs": {"GT": {"courses_avg": 80}}};
+				let x = {NOTs: {GT: {courses_avg: 80}}};
 				let result = ValidationObject.ValidateNegation(x);
 				expect(result).to.be.false;
 			});
@@ -216,7 +216,7 @@ describe("Validation", function () {
 	describe ("Validate Options", function() {
 		describe ("Validate Columns", function() {
 			it("Should return True - Valid Columns", function() {
-				let x = {"COLUMNS" : ["courses_avg", "courses_dept"]};
+				let x = {COLUMNS : ["courses_avg", "courses_dept"]};
 				let result = ValidationObject.ValidateColumns(x);
 				expect(result).to.be.true;
 			});
