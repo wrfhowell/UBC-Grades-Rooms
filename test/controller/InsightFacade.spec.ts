@@ -397,19 +397,19 @@ describe("InsightFacade", function () {
 				});
 		});
 
-		it("Should be able to add Dataset after calling removeDataset"), function () {
-			return facade.addDataset("courses", courses, InsightDatasetKind.Courses)
-				.then(() => {
-					return facade.removeDataset("courses");
-				})
-				.then(() => {
-					return facade.addDataset("courses", courses, InsightDatasetKind.Courses);
-				})
-				.then((addedDataset) => {
-					expect(addedDataset).to.be.instanceof(Array);
-					expect(addedDataset).to.have.length(1);
-				});
-		};
+		// it("Should be able to add Dataset after calling removeDataset"), function () {
+		// 	return facade.addDataset("courses", courses, InsightDatasetKind.Courses)
+		// 		.then(() => {
+		// 			return facade.removeDataset("courses");
+		// 		})
+		// 		.then(() => {
+		// 			return facade.addDataset("courses", courses, InsightDatasetKind.Courses);
+		// 		})
+		// 		.then((addedDataset) => {
+		// 			expect(addedDataset).to.be.instanceof(Array);
+		// 			expect(addedDataset).to.have.length(1);
+		// 		});
+		// };
 
 		it("Should throw InsightError if id contains underscore", function () {
 			return facade.addDataset("courses", courses, InsightDatasetKind.Courses)
