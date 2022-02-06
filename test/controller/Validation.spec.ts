@@ -214,10 +214,27 @@ describe("Validation", function () {
 
 	});
 	describe ("Validate Options", function() {
+		it("Should return False - Order key not in columns", function() {
+			let x = {COLUMNS : ["courses_avg"], ORDER : "courses_dept"};
+			let result = ValidationObject.ValidateOptions(x);
+			expect(result).to.be.false;
+		});
+		it("Should return True - Order key is in Columns", function() {
+			let x = {COLUMNS : ["courses_avg", "courses_dept"], ORDER : "courses_dept"};
+			let result = ValidationObject.ValidateOptions(x);
+			expect(result).to.be.true;
+		});
 		describe ("Validate Columns", function() {
 			it("Should return True - Valid Columns", function() {
 				let x = ["courses_avg", "courses_dept"];
 				let result = ValidationObject.ValidateColumns(x);
+				expect(result).to.be.true;
+			});
+		});
+		describe("Validate Orders", function() {
+			it("Should return True - Valid Order key", function() {
+				let x = "courses_avg";
+				let result = ValidationObject.ValidateOrder(x);
 				expect(result).to.be.true;
 			});
 		});

@@ -62,13 +62,19 @@ export class Validation {
 		// if (Object.keys(Options)[0] !== "OPTIONS") {
 		// 	return false;
 		// }
-		let resultOfValidateOrder = true;
+		let resultOfValidateOrder = false;
+		let resultOfValidateColumn = false;
 		let ColumnObject = Options.COLUMNS;
 		let OrderObject = Options.ORDER;
+		let resultOfOrderInColumn = ColumnObject.includes(OrderObject);
 		if (OrderObject !== undefined) {
 			resultOfValidateOrder = this.ValidateOrder(OrderObject);
 		}
-		return resultOfValidateOrder && this.ValidateColumns(ColumnObject) && OrderObject.includes(OrderObject);
+		if (ColumnObject !== undefined) {
+			resultOfValidateColumn = this.ValidateColumns(ColumnObject);
+		}
+		console.log("column: " + resultOfValidateColumn + " order: " + resultOfValidateOrder + resultOfOrderInColumn);
+		return resultOfValidateOrder && resultOfValidateColumn && resultOfOrderInColumn;
 	}
 	public ValidateOrder(Orders: any): boolean {
 		return this.ValidateKey(Orders);

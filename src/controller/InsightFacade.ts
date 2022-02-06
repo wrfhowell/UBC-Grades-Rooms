@@ -39,7 +39,7 @@ export default class InsightFacade implements IInsightFacade {
 				console.log("oops query broken");
 			}
 		}
-		return Promise.reject("Not implemented.");
+		return Promise.reject(new InsightError("Add your error message here"));
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
