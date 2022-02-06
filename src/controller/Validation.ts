@@ -1,22 +1,20 @@
 import {InsightError, ResultTooLargeError} from "./IInsightFacade";
+import chai, {expect} from "chai";
+import chaiAsPromised from "chai-as-promised";
 
+chai.use(chaiAsPromised);
 
 export class Validation {
 	private type = "";
+	private ColumnsOfCurrentQuery = [];
 	constructor () {
 		this.type = "yes";
 	}
 	public Validate (query: any) {
 		let queryKeys = Object.keys(query);
 		let modelKeys = ["WHERE", "OPTIONS"];
-		console.log("length of query keys: " + queryKeys.length);
-		console.log("type of queryKeys: " + typeof queryKeys);
-		console.log("type of modelKeys: " + typeof modelKeys);
-		console.log("queryKeys == modelKeys? ");
-		console.log("Where clause: " + JSON.stringify(query.WHERE));
-		console.log("Options Clause: " + JSON.stringify(query.OPTIONS));
-		if (queryKeys.length === 2) {
-			return this.ValidateWhere(query[0]) && this.ValidateOptions(query[1]);
+		if (queryKeys.length === 2 && Object.keys(query)[0] === "WHERE" && Object.keys(query)[1] === "OPTIONS") {
+			return this.ValidateWhere(query.WHERE) && this.ValidateOptions(query.OPTIONS);
 		} else {
 			return false;
 		}
@@ -54,42 +52,34 @@ export class Validation {
 		}
 	}
 	public ValidateWhere(WhereClause: any): boolean {
-		if (JSON.stringify(WhereClause.WHERE) === "{}") {
+		if (JSON.stringify(WhereClause) === "{}") {
 			return true;
 		} else {
-			return this.ValidateFilters(WhereClause.WHERE);
+			return this.ValidateFilters(WhereClause);
 		}
 	}
 	public ValidateOptions(Options: any): boolean {
-		if (Object.keys(Options)[0] !== "OPTIONS") {
-			return false;
-		}
+		// if (Object.keys(Options)[0] !== "OPTIONS") {
+		// 	return false;
+		// }
 		let resultOfValidateOrder = true;
-		let ColumnObject = Options.OPTIONS[0];
-		let OrderObject = Options.OPTIONS[1];
+		let ColumnObject = Options.COLUMNS;
+		let OrderObject = Options.ORDER;
 		if (OrderObject !== undefined) {
 			resultOfValidateOrder = this.ValidateOrder(OrderObject);
 		}
-		return resultOfValidateOrder || this.ValidateColumns(ColumnObject);
-
+		return resultOfValidateOrder && this.ValidateColumns(ColumnObject) && OrderObject.includes(OrderObject);
 	}
 	public ValidateOrder(Orders: any): boolean {
-		for (let i of Orders.ORDER) {
-			if (this.ValidateKey(i) === false) {
-				return false;
-			}
-		}
-		return true;
+		return this.ValidateKey(Orders);
 	}
 	public ValidateColumns(Columns: any): boolean {
-		console.log("this is property key: " + Object.keys(Columns)[0]);
-		if (Object.keys(Columns)[0] !== "COLUMNS") {
-			return false;
-		}
-		let ColumnKeys = Columns.COLUMNS;
-		for (let key of ColumnKeys) {
+		// if (Object.keys(Columns)[0] !== "COLUMNS") {
+		// 	return false;
+		// }
+		// let ColumnKeys = Columns.COLUMNS;
+		for (let key of Columns) {
 			if (this.ValidateKey(key) === false) {
-				console.log("this is the current validation key value: " + this.ValidateKey(key));
 				return false;
 			}
 		}
@@ -110,17 +100,14 @@ export class Validation {
 	}
 	public ValidateInputString(inputString: any): boolean {
 		const InputString = new RegExp("[^*]*");
-		console.log(InputString.test(inputString));
 		return InputString.test(inputString);
 	}
 	public ValidateIdString(idString: any): boolean {
 		const IdStringRegEx = new RegExp("[^_]+");
 		return IdStringRegEx.test(idString);
-		console.log(IdStringRegEx.test(idString));
 	}
 	public ValidateFilters(Filter: any): boolean {
 		let propertyKey = Object.keys(Filter)[0];
-		console.log("This is propertyKey: " + propertyKey);
 		if (this.ValidateLogic(propertyKey)) {
 			return this.ValidateLogicComparison(Filter);
 		}
@@ -144,14 +131,28 @@ export class Validation {
 		if (this.ValidateLogic(LogicComparisonKey) && Object.keys(LogicComparison).length === 1) {
 			if (LogicComparisonKey === "AND") {
 				let arrayOfANDClause = LogicComparison.AND;
+				let lastPositionOfAndClause = (arrayOfANDClause.length - 1).toString();
 				for (let i in arrayOfANDClause) {
-					this.ValidateFilters(arrayOfANDClause[i]);
+					if (!this.ValidateFilters(arrayOfANDClause[i])) {
+						return false;
+					} else {
+						if (this.ValidateFilters(arrayOfANDClause[i]) && i === lastPositionOfAndClause) {
+							return true;
+						}
+					}
 				}
 			} else {
 				if (LogicComparisonKey === "OR") {
 					let arrayOfORClause = LogicComparison.OR;
+					let lastPositionOfOrClause = (arrayOfORClause.length - 1).toString();
 					for (let i in arrayOfORClause) {
-						this.ValidateFilters(arrayOfORClause[i]);
+						if (!this.ValidateFilters(arrayOfORClause[i])) {
+							return false;
+						} else {
+							if (this.ValidateFilters(arrayOfORClause[i]) && i === lastPositionOfOrClause) {
+								return true;
+							}
+						}
 					}
 				}
 			}
@@ -163,15 +164,10 @@ export class Validation {
 	}
 	public ValidateMComparison(MComparison: any): boolean {
 		let mComparatorKey = Object.keys(MComparison)[0];
-		console.log("this is mComparatorKey: " + mComparatorKey);
 		if (this.ValidateMComparitor(mComparatorKey)) {
 			let mKeyClause = MComparison[`${mComparatorKey}`];
-			console.log("this is MComparison passed in: " + JSON.stringify(MComparison));
-			console.log("this is MComparison.GT : " + JSON.stringify(MComparison[`${mComparatorKey}`]));
-			console.log("this is mKeyClause: " + mKeyClause);
 			let mKey = Object.keys(mKeyClause)[0];
 			if (this.ValidateMKey(mKey)) {
-				console.log("this is type of mkeyclause: " + typeof (mKeyClause[`${mKey}`]));
 				return typeof (mKeyClause[`${mKey}`]) === "number";
 			}
 		}

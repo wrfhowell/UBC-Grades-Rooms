@@ -34,6 +34,10 @@ export default class InsightFacade implements IInsightFacade {
 		const y = new Execution();
 		if (x.Validate(query)) {
 			y.Execute(query);
+		} else {
+			if (!x.Validate(query)) {
+				console.log("oops query broken");
+			}
 		}
 		return Promise.reject("Not implemented.");
 	}

@@ -82,20 +82,20 @@ describe("Validation", function () {
 	describe("ValidateWhere", function () {
 
 		it("Should return true if Where Statement is correct", function () {
-			let x = {WHERE: {}};
+			let x = {};
 			let result = ValidationObject.ValidateWhere(x);
 			expect(result).to.be.true;
 		});
 
 		it("Should return true if Filters Statement is correct", function () {
-			let x = {WHERE: {GT: {courses_avg: 80}}};
+			let x = {GT: {courses_avg: 80}};
 			let result = ValidationObject.ValidateWhere(x);
 			expect(result).to.be.true;
 		});
 
-		it("Should return true if Filters Statement is correct", function () {
-			return false;
-		});
+		// it("Should return true if Filters Statement is correct", function () {
+		// 	return false;
+		// });
 
 
 	});
@@ -216,7 +216,7 @@ describe("Validation", function () {
 	describe ("Validate Options", function() {
 		describe ("Validate Columns", function() {
 			it("Should return True - Valid Columns", function() {
-				let x = {COLUMNS : ["courses_avg", "courses_dept"]};
+				let x = ["courses_avg", "courses_dept"];
 				let result = ValidationObject.ValidateColumns(x);
 				expect(result).to.be.true;
 			});
