@@ -50,7 +50,7 @@ module.exports = {
 		"@typescript-eslint/consistent-type-assertions": "error",
 		"@typescript-eslint/naming-convention": [
 			"error",
-			{"selector": "typeLike", "format": ["PascalCase"]},
+			{"selector": "typeLike", "format": ["camelCase", "PascalCase"]},
 			{"selector": "variable", "format": ['camelCase', "PascalCase", "UPPER_CASE"]}
 		],
 		"@typescript-eslint/no-explicit-any": "off",
@@ -96,7 +96,7 @@ module.exports = {
 		"no-unused-vars": "off",
 		"no-var": "error",
 		"prefer-const": "off",
-		"quote-props": ["error", "consistent-as-needed"],
+		"quote-props": ["error",  "consistent-as-needed"],
 		"quotes": ["error", "double", {"avoidEscape": true}],
 		"radix": "error",
 		"semi": "error",

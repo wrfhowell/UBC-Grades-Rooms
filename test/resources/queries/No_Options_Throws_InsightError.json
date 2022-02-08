@@ -1,0 +1,12 @@
+{
+  "title" : "No_Options_Throws_InsightError",
+  "input" : {
+    "WHERE":{
+      "GT":{
+        "courses_avg":97
+      }
+    }
+  },
+  "errorExpected" : true,
+  "expected" : "InsightError"
+}

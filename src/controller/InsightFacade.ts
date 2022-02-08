@@ -2,6 +2,10 @@ import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, Insigh
 import AddDatasetHelper from "./AddDatasetHelper";
 import JSONHandler from "./JSONHandler";
 
+import {Validation} from "./Validation";
+import {Execution} from "./Execution";
+
+
 /**
  * This is the main programmatic entry point for the project.
  * Method documentation is in IInsightFacade
@@ -51,6 +55,11 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public performQuery(query: unknown): Promise<InsightResult[]> {
+		const x = new Validation();
+		const y = new Execution();
+		if (x.Validate(query)) {
+			y.Execute(query);
+		}
 		return Promise.reject("Not implemented.");
 	}
 

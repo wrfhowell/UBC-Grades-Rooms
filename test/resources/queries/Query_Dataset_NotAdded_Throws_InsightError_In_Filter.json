@@ -1,0 +1,19 @@
+{
+  "title" : "Query_Dataset_NotAdded_Throws_InsightError",
+  "input" : {
+    "WHERE":{
+      "GT":{
+        "coursesNull_avg":97
+      }
+    },
+    "OPTIONS":{
+      "COLUMNS":[
+        "courses_dept",
+        "courses_avg"
+      ],
+      "ORDER":"courses_avg"
+    }
+  },
+  "errorExpected" : true,
+  "expected" : "InsightError"
+}

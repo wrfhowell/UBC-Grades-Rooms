@@ -1,0 +1,18 @@
+{
+  "title": "Is_Should_Only_Have_One_Key_Throws_InsightError",
+  "input": {
+    "WHERE": {
+      "IS": {
+        "__dept": "math"
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "__title"
+      ],
+      "ORDER": "__dept"
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}
