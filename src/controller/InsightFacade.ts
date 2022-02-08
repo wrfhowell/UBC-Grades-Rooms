@@ -11,7 +11,7 @@ export default class InsightFacade implements IInsightFacade {
 	// key is string containing id, value is array of parse json files into string?
 	public insightData: Map<string, any[]> = new Map<string, any[]>();
 	// updated after addDataset adds a dataset - contains ids strings of datasets
-	public addedDatasets: InsightDataset[] = [];
+	public addedDatasets: Map<string, InsightDataset> = new Map<string, InsightDataset>();
 
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
@@ -55,6 +55,7 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
-		return Promise.resolve(this.addedDatasets);
+		// return Promise.resolve(this.addedDatasets);
+		return Promise.reject("Not implementsd.");
 	}
 }
