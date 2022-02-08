@@ -182,9 +182,12 @@ export class Validation {
 	public ValidateSComparison(SComparison: any): boolean {
 		let SCompRegEx = new RegExp("`*`?" + "[^*]*" + "`*`?");
 		let sCompKey = Object.keys(SComparison)[0];
+		let sKeyClause = SComparison[`${sCompKey}`];
 		let skey = Object.keys(SComparison.IS)[0];
+		console.log("skey value: " + skey + "sComKey Value: " + sCompKey + "sKeyClause: " + sKeyClause);
 		if (sCompKey === "IS" && this.ValidateSKey(skey)) {
-			return SCompRegEx.test(SComparison.IS);
+			let sKeyClauseValue = sKeyClause[`${skey}`];
+			return SCompRegEx.test(sKeyClauseValue) && typeof sKeyClauseValue === "string";
 		}
 		return false;
 	}

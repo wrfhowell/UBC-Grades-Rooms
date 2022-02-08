@@ -136,6 +136,12 @@ describe("Validation", function () {
 				expect(x).to.be.false;
 			});
 
+			it("Should return False - Skey Value is not String", function() {
+				let obj = {IS: {courses__dept: 94}};
+				let x = ValidationObject.ValidateSComparison(obj);
+				expect(x).to.be.false;
+			});
+
 			describe("Skey", function() {
 				it("Should match regex for Skey", function() {
 					let x = ValidationObject.ValidateSKey("courses_dept");
@@ -147,6 +153,11 @@ describe("Validation", function () {
 					expect(x).to.be.false;
 				});
 
+				it("Should NOT match regex for Skey - all asterisks", function() {
+					let x = ValidationObject.ValidateSKey("****");
+					expect(x).to.be.false;
+				});
+
 				it("Should NOT match regex for Skey - wrong s key", function() {
 					let x = ValidationObject.ValidateSKey("courses_what");
 					expect(x).to.be.false;
@@ -154,6 +165,10 @@ describe("Validation", function () {
 
 				it("Should NOT match regex for Skey - two underscores", function() {
 					let x = ValidationObject.ValidateSKey("courses__dept");
+					expect(x).to.be.false;
+				});
+				it("Should NOT match regex for Skey - underscore at the start", function() {
+					let x = ValidationObject.ValidateIdString("_courses_dept");
 					expect(x).to.be.false;
 				});
 
