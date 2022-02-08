@@ -53,7 +53,11 @@ export default class JSONHandler{
 
 		return 1;
 	}
-	public static getContent(id: string, content: string, data: InsightFacade, resolve: (value: any) => any, reject: (value: any) => any): any {
+	public static getContent(
+		id: string,
+		content: string,
+		data: InsightFacade,
+		resolve: (value: any) => any, reject: (value: any) => any): any {
 
 		let jszip: JSZip = new JSZip();
 		let courseName: string;

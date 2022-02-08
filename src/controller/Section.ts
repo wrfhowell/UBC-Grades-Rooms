@@ -13,15 +13,16 @@ export default class Section {
 	private _uuid: string;
 	private _year: number;
 
-	public constructor(dept: string,
-					   id: string,
-					   avg: number,
-					   instructor: string,
-					   title: string,
-					   pass: number,
-					   fail: number,
-					   audit: number,
-					   uuid: string) {
+	public constructor(
+		dept: string,
+		id: string,
+		avg: number,
+		instructor: string,
+		title: string,
+		pass: number,
+		fail: number,
+		audit: number,
+		uuid: string) {
 		this._dept = dept;
 		this._id = id;
 		this._avg = avg;
