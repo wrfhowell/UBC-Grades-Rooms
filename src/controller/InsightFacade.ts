@@ -1,11 +1,6 @@
-import {
-	IInsightFacade,
-	InsightDataset,
-	InsightDatasetKind,
-	InsightError,
-	InsightResult,
-	NotFoundError
-} from "./IInsightFacade";
+import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult,} from "./IInsightFacade";
+import AddDatasetHelper from "./AddDatasetHelper";
+import JSONHandler from "./JSONHandler";
 
 import {Validation} from "./Validation";
 import {Execution} from "./Execution";
@@ -20,12 +15,14 @@ import Course from "./Course";
  *
  */
 export default class InsightFacade implements IInsightFacade {
+	// key is string containing id, value is array of parse json files into string?
 	public insightData: Map<string, any[]> = new Map<string, any[]>();
 	// updated after addDataset adds a dataset - contains ids strings of datasets
 	public addedDatasets: Map<string, InsightDataset> = new Map<string, InsightDataset>();
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
 	}
+
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		// return new Promise<string[]>((resolve,reject) => {
@@ -74,6 +71,7 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
-		return Promise.reject("Not implemented.");
+		// return Promise.resolve(this.addedDatasets);
+		return Promise.reject("Not implementsd.");
 	}
 }

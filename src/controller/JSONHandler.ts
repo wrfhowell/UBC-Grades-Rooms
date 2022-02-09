@@ -59,6 +59,7 @@ export default class JSONHandler{
 		data: InsightFacade,
 		resolve: (value: any) => any, reject: (value: any) => any): any {
 
+
 		let jszip: JSZip = new JSZip();
 		let courseName: string;
 
