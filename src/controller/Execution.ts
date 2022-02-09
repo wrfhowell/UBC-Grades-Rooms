@@ -14,17 +14,25 @@ export class Execution {
 	public Execute(query: any, dataset: Course): string[] {
 		let columns = this.ReturnColumns(query);
 		let validQueriedSections = this.Query(query, dataset);
-		return this.ReturnResults(columns, validQueriedSections);
+		let unorderedResults = this.ReturnResults(columns, validQueriedSections);
+		let orderedResults = this.ReturnOrderedSections(this.ReturnOrder(query), unorderedResults);
+		return orderedResults;
 	}
 	public ReturnColumns(query: any): string[] {
 		return query.OPTIONS.COLUMNS;
+	}
+	public ReturnOrder(query: any): string {
+		return query.OPTIONS.ORDER;
+	}
+	public ReturnOrderedSections(orderKey: any, sections: any) {
+		return sections.sort((a: any, b: any) => a[`${orderKey}`] - b[`${orderKey}`]);
 	}
 	public Query(query: any, dataset: Course): any {
 		return this.ExecuteWhere(query.WHERE, dataset);
 	}
 	public ExecuteWhere(WhereClause: any, dataset: Course): any {
 		if (JSON.stringify(WhereClause) === "{}") {
-			return dataset;
+			return dataset.sections;
 		}
 		return this.ExecuteFilter(WhereClause, dataset);
 	}
@@ -79,7 +87,6 @@ export class Execution {
 				for (let i in logicCompClause) {
 					x = this.ExecuteFilter(logicCompClause[i], dataset);
 					unionORCase.push(x);
-					console.log(logicCompClause[i]);
 				}
 				let union = unionORCase.reduce((a: any, b: any) => Array.from(new Set(a.concat(b))));
 				return union;
@@ -130,13 +137,13 @@ export class Execution {
 				break;
 			}
 			case "EQ" : {
-				let queriedLTCase = dataset.sections.reduce((previousValue: Section[], currentValue: any) => {
+				let queriedEQCase = dataset.sections.reduce((previousValue: Section[], currentValue: any) => {
 					if (currentValue[`${mField}`] === ValueToCompare) {
 						previousValue.push(currentValue);
 					}
 					return previousValue;
 				}, []);
-				return queriedLTCase;
+				return queriedEQCase;
 				break;
 			}
 			default: return [];
@@ -150,7 +157,6 @@ export class Execution {
 		let datasetSections = dataset.sections;
 		x = this.ExecuteFilter(negationClause, dataset);
 		DifferenceNOTCase.push(x);
-		console.log(negationClause);
 		let valuesToBeExcluded = DifferenceNOTCase.reduce((a: any, b: any) => Array.from(new Set(a.concat(b))));
 		let difference = datasetSections.filter((y: any) => !valuesToBeExcluded.includes(y));
 		return difference;

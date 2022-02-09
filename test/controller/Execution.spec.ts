@@ -68,7 +68,7 @@ let x = new Execution();
 dataset.set("courses", courseArray);
 
 describe("Execution", function () {
-	it("Should return correct queried dataset", function() {
+	it("Should return correct queried dataset", function () {
 		let course = courseArray[0];
 		let sections = course.sections;
 		// console.log(sections);
@@ -91,45 +91,64 @@ describe("Execution", function () {
 			result.push(curSection);
 			curSection = {};
 		}
-		console.log(result);
+		expect(result).to.deep.equal([
+			{avg: 87.5, uuid: "001", title: "cpsc121", dept: "cpsc"},
+			{avg: 69.2, uuid: "02341", title: "engl112", dept: "cpsc"}
+		]
+		);
 	});
-	it("Should return correct sections V2", function() {
-		let sections = x.ExecuteMComparison({LT : {avg: 51}},courseArray[0]);
+	it("Should return correct sections V2", function () {
+		let sections = x.ExecuteMComparison({LT: {avg: 51}}, courseArray[0]);
 		let results = x.ReturnResults(["avg", "dept", "title"], sections);
-		console.log(results);
+		expect(results).to.deep.equal([{avg: 50.3, dept: "cpsc", title: "math200"}]);
 	});
-	it("Should return correct sections - test SComparison", function() {
+	it("Should return correct sections - test SComparison", function () {
 		let sections = x.ExecuteSComparison({IS: {dept: "cpsc"}}, courseArray[0]);
 		let results = x.ReturnResults(["uuid", "title", "avg", "dept"], sections);
-		console.log(results);
+		expect(results).to.deep.equal([
+			{uuid: "001", title: "cpsc121", avg: 87.5, dept: "cpsc"},
+			{uuid: "02341", title: "engl112", avg: 69.2, dept: "cpsc"},
+			{uuid: "2351", title: "math200", avg: 50.3, dept: "cpsc"}
+		]
+		);
 	});
-	it("Should merge two Sections[]", function() {
+	it("Should merge two Sections[]", function () {
 		let sections1 = [section1, section2];
 		let sections2 = [section3, section4];
 		let union = [...new Set([...sections1, ...sections2])];
-		console.log(union);
+		expect(union).to.deep.equal([section1, section2, section3, section4]);
 	});
-	it("Should return correct sections - test OR Simple", function() {
+	it("Should return correct sections - test OR Simple", function () {
 		let sections = x.ExecuteFilter({OR: [{LT: {avg: 51}}, {GT: {avg: 51}}]}, courseArray[0]);
-		let results = x.ReturnResults(["uuid","title","avg","dept"], sections);
-		console.log(results);
+		let results = x.ReturnResults(["uuid", "title", "avg", "dept"], sections);
+		expect(results).to.deep.equal([
+			{uuid: "2351", title: "math200", avg: 50.3, dept: "cpsc"},
+			{uuid: "001", title: "cpsc121", avg: 87.5, dept: "cpsc"},
+			{uuid: "02341", title: "engl112", avg: 69.2, dept: "cpsc"}
+		]
+		);
 	});
-	it("Should return correct sections - test AND Simple", function() {
+	it("Should return correct sections - test AND Simple", function () {
 		let sections = x.ExecuteFilter({AND: [{LT: {avg: 80}}, {GT: {avg: 51}}]}, courseArray[0]);
-		let results = x.ReturnResults(["uuid","title","avg","dept"], sections);
-		console.log(results);
+		let results = x.ReturnResults(["uuid", "title", "avg", "dept"], sections);
+		expect(results).to.deep.equal([{uuid: "02341", title: "engl112", avg: 69.2, dept: "cpsc"}]);
 	});
-	it("Should return correct sections - test NOT Simple", function() {
-		let sections = x.ExecuteFilter({NOT: {GT: {avg: 80}}}, courseArray[0]);
-		let results = x.ReturnResults(["uuid","title","avg","dept"], sections);
-		console.log(results);
+	it("Should return correct sections - test NOT Simple", function () {
+		let sections = x.ExecuteFilter({NOT: {NOT: {NOT: {GT: {avg: 80}}}}}, courseArray[0]);
+		let results = x.ReturnResults(["uuid", "title", "avg", "dept"], sections);
+		expect(results).to.deep.equal([
+			{uuid: "02341", title: "engl112", avg: 69.2, dept: "cpsc"},
+			{uuid: "2351", title: "math200", avg: 50.3, dept: "cpsc"}
+		]);
 	});
-	it("Should return correct sections - test AND with IS", function() {
+	it("Should return correct sections - test AND with IS", function () {
 		let sections = x.ExecuteFilter({AND: [{LT: {avg: 80}}, {GT: {avg: 51}}, {IS: {dept: "cpsc"}}]}, courseArray[0]);
-		let results = x.ReturnResults(["uuid","title","avg","dept"], sections);
-		console.log(results);
+		let results = x.ReturnResults(["dept", "id", "avg"], sections);
+		expect(results).to.deep.equal([
+			{dept: "cpsc", id: "324", avg: 69.2}
+		]);
 	});
-	it("Should return correct sections - test Execute", function() {
+	it("Should return correct sections - test Execute", function () {
 		let query = {
 			WHERE: {
 				GT: {
@@ -141,14 +160,16 @@ describe("Execution", function () {
 					"dept",
 					"avg"
 				],
-				ORDER: "courses_avg"
+				ORDER: "avg"
 			}
 		};
-		let result = x.Execute(query,courseArray[0]);
-		console.log(result);
-		console.log("coursesavg".split("_").pop());
+		let result = x.Execute(query, courseArray[0]);
+		expect(result).deep.equal([
+			{dept: "cpsc", avg: 69.2},
+			{dept: "cpsc", avg: 87.5}
+		]);
 	});
-	it("Should return right sections - complex query", function() {
+	it("Should return right sections - complex query", function () {
 		let query = {
 			WHERE: {
 				OR: [
@@ -179,11 +200,22 @@ describe("Execution", function () {
 					"id",
 					"avg"
 				],
-				ORDER: "courses_avg"
+				ORDER: "avg"
 			}
 		};
 		let result = x.Execute(query, courseArray[0]);
-		console.log(result);
+		expect(result).to.deep.equal([
+			{dept: "cpsc", id: "324", avg: 69.2},
+			{dept: "cpsc", id: "001", avg: 87.5}
+		]);
 	});
-
+	it("Should return right order", function () {
+		let query = {WHERE: {}, OPTIONS: {COLUMNS: ["avg", "title"], ORDER: "avg"}};
+		let result = x.Execute(query, courseArray[0]);
+		expect(result).to.deep.equal([
+			{avg: 50.3, title: "math200"},
+			{avg: 69.2, title: "engl112"},
+			{avg: 87.5, title: "cpsc121"}
+		]);
+	});
 });
