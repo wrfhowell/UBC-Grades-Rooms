@@ -13,7 +13,8 @@ export default class Section {
 	private _uuid: string;
 	private _year: number;
 
-	public constructor(dept: string,
+	public constructor(
+		dept: string,
 		id: string,
 		avg: number,
 		instructor: string,

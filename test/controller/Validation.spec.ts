@@ -82,20 +82,20 @@ describe("Validation", function () {
 	describe("ValidateWhere", function () {
 
 		it("Should return true if Where Statement is correct", function () {
-			let x = {WHERE: {}};
+			let x = {};
 			let result = ValidationObject.ValidateWhere(x);
 			expect(result).to.be.true;
 		});
 
 		it("Should return true if Filters Statement is correct", function () {
-			let x = {WHERE: {GT: {courses_avg: 80}}};
+			let x = {GT: {courses_avg: 80}};
 			let result = ValidationObject.ValidateWhere(x);
 			expect(result).to.be.true;
 		});
 
-		it("Should return true if Filters Statement is correct", function () {
-			return false;
-		});
+		// it("Should return true if Filters Statement is correct", function () {
+		// 	return false;
+		// });
 
 
 	});
@@ -136,6 +136,12 @@ describe("Validation", function () {
 				expect(x).to.be.false;
 			});
 
+			it("Should return False - Skey Value is not String", function() {
+				let obj = {IS: {courses__dept: 94}};
+				let x = ValidationObject.ValidateSComparison(obj);
+				expect(x).to.be.false;
+			});
+
 			describe("Skey", function() {
 				it("Should match regex for Skey", function() {
 					let x = ValidationObject.ValidateSKey("courses_dept");
@@ -147,6 +153,11 @@ describe("Validation", function () {
 					expect(x).to.be.false;
 				});
 
+				it("Should NOT match regex for Skey - all asterisks", function() {
+					let x = ValidationObject.ValidateSKey("****");
+					expect(x).to.be.false;
+				});
+
 				it("Should NOT match regex for Skey - wrong s key", function() {
 					let x = ValidationObject.ValidateSKey("courses_what");
 					expect(x).to.be.false;
@@ -154,6 +165,10 @@ describe("Validation", function () {
 
 				it("Should NOT match regex for Skey - two underscores", function() {
 					let x = ValidationObject.ValidateSKey("courses__dept");
+					expect(x).to.be.false;
+				});
+				it("Should NOT match regex for Skey - underscore at the start", function() {
+					let x = ValidationObject.ValidateIdString("_courses_dept");
 					expect(x).to.be.false;
 				});
 
@@ -214,10 +229,27 @@ describe("Validation", function () {
 
 	});
 	describe ("Validate Options", function() {
+		it("Should return False - Order key not in columns", function() {
+			let x = {COLUMNS : ["courses_avg"], ORDER : "courses_dept"};
+			let result = ValidationObject.ValidateOptions(x);
+			expect(result).to.be.false;
+		});
+		it("Should return True - Order key is in Columns", function() {
+			let x = {COLUMNS : ["courses_avg", "courses_dept"], ORDER : "courses_dept"};
+			let result = ValidationObject.ValidateOptions(x);
+			expect(result).to.be.true;
+		});
 		describe ("Validate Columns", function() {
 			it("Should return True - Valid Columns", function() {
-				let x = {COLUMNS : ["courses_avg", "courses_dept"]};
+				let x = ["courses_avg", "courses_dept"];
 				let result = ValidationObject.ValidateColumns(x);
+				expect(result).to.be.true;
+			});
+		});
+		describe("Validate Orders", function() {
+			it("Should return True - Valid Order key", function() {
+				let x = "courses_avg";
+				let result = ValidationObject.ValidateOrder(x);
 				expect(result).to.be.true;
 			});
 		});

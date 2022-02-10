@@ -4,6 +4,9 @@ import JSONHandler from "./JSONHandler";
 
 import {Validation} from "./Validation";
 import {Execution} from "./Execution";
+import JSONHandler from "./JSONHandler";
+import AddDatasetHelper from "./AddDatasetHelper";
+import Course from "./Course";
 
 
 /**
@@ -16,38 +19,37 @@ export default class InsightFacade implements IInsightFacade {
 	public insightData: Map<string, any[]> = new Map<string, any[]>();
 	// updated after addDataset adds a dataset - contains ids strings of datasets
 	public addedDatasets: Map<string, InsightDataset> = new Map<string, InsightDataset>();
-
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
 	}
 
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		return new Promise<string[]>((resolve,reject) => {
-			// check if id is valid according to spec
-			if (!AddDatasetHelper.validIdCheck(id)) {
-				reject(new InsightError("Invalid ID Inputted"));
-			}
-
-			// check if id has already been added before
-			if (AddDatasetHelper.idAddedAlready(id,this)) {
-				reject(new InsightError("ID already added"));
-			}
-
-			// check for right kind (only courses)
-			if (kind !== InsightDatasetKind.Courses){
-				reject(new InsightError("Unknown kind"));
-			}
-
-			// check if content string is invalid
-			if (content === null || content === "") {
-				reject(new InsightError("invalid content name"));
-			}
-
-
-			// get content from zip file and parse into dataset
-			return JSONHandler.getContent(id, content, this, resolve, reject);
-		});
+		// return new Promise<string[]>((resolve,reject) => {
+		// 	// check if id is valid according to spec
+		// 	if (!AddDatasetHelper.validIdCheck(id)) {
+		// 		reject(new InsightError("Invalid ID Inputted"));
+		// 	}
+		//
+		// 	// check if id has already been added before
+		// 	if (AddDatasetHelper.idAddedAlready(id,this)) {
+		// 		reject(new InsightError("ID already added"));
+		// 	}
+		//
+		// 	// check for right kind (only courses)
+		// 	if (kind !== InsightDatasetKind.Courses){
+		// 		reject(new InsightError("Unknown kind"));
+		// 	}
+		//
+		// 	// check if content string is invalid
+		// 	if (content === null || content === "") {
+		// 		reject(new InsightError("invalid content name"));
+		// 	}
+		//
+		//
+		// 	// get content from zip file and parse into dataset
+		// 	return JSONHandler.getContent(id, content, this, resolve, reject);
+		return Promise.reject("Not implemented");
 	}
 
 	public removeDataset(id: string): Promise<string> {
@@ -57,10 +59,15 @@ export default class InsightFacade implements IInsightFacade {
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 		const x = new Validation();
 		const y = new Execution();
+		let dataset = new Course("test", 5);
 		if (x.Validate(query)) {
-			y.Execute(query);
+			y.Execute(query, dataset);
+		} else {
+			if (!x.Validate(query)) {
+				console.log("oops query broken");
+			}
 		}
-		return Promise.reject("Not implemented.");
+		return Promise.reject(new InsightError("Add your error message here"));
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
