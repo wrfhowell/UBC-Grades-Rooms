@@ -12,41 +12,44 @@ import Course from "./Course";
  *
  */
 export default class InsightFacade implements IInsightFacade {
-	// key is string containing id, value is array of parse json files into string?
-	public insightData: Map<string, any[]> = new Map<string, any[]>();
+	// key is string containing id, value is array of courses containing sections or rooms?
+	public insightData: Map<string, Course[]> = new Map<string, Course[]>();
 	// updated after addDataset adds a dataset - contains ids strings of datasets
-	public addedDatasets: Map<string, InsightDataset> = new Map<string, InsightDataset>();
+	public addedDatasets: InsightDataset[] = [];
+	// array of added ids
+	public idArray: string[] = [];
+
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
 	}
 
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		// return new Promise<string[]>((resolve,reject) => {
-		// 	// check if id is valid according to spec
-		// 	if (!AddDatasetHelper.validIdCheck(id)) {
-		// 		reject(new InsightError("Invalid ID Inputted"));
-		// 	}
-		//
-		// 	// check if id has already been added before
-		// 	if (AddDatasetHelper.idAddedAlready(id,this)) {
-		// 		reject(new InsightError("ID already added"));
-		// 	}
-		//
-		// 	// check for right kind (only courses)
-		// 	if (kind !== InsightDatasetKind.Courses){
-		// 		reject(new InsightError("Unknown kind"));
-		// 	}
-		//
-		// 	// check if content string is invalid
-		// 	if (content === null || content === "") {
-		// 		reject(new InsightError("invalid content name"));
-		// 	}
-		//
-		//
-		// 	// get content from zip file and parse into dataset
-		// 	return JSONHandler.getContent(id, content, this, resolve, reject);
-		return Promise.reject("Not implemented");
+		return new Promise<string[]>((resolve,reject) => {
+			// check if id is valid according to spec
+			if (!AddDatasetHelper.validIdCheck(id)) {
+				return reject(new InsightError("Invalid ID Inputted"));
+			}
+
+			// check if id has already been added before
+			if (AddDatasetHelper.idAddedAlready(id, this)) {
+				return reject(new InsightError("ID already added"));
+			}
+
+			// check for right kind (only courses)
+			if (kind !== InsightDatasetKind.Courses) {
+				return reject(new InsightError("Unknown kind"));
+			}
+
+			// check if content string is invalid
+			if (content === null || content === "") {
+				return reject(new InsightError("invalid content name"));
+			}
+
+			console.log("1");
+			// get content from zip file and parse into dataset
+			return JSONHandler.getContent(id, content, this, resolve, reject);
+		});
 	}
 
 	public removeDataset(id: string): Promise<string> {
@@ -69,6 +72,6 @@ export default class InsightFacade implements IInsightFacade {
 
 	public listDatasets(): Promise<InsightDataset[]> {
 		// return Promise.resolve(this.addedDatasets);
-		return Promise.reject("Not implementsd.");
+		return Promise.resolve(this.addedDatasets);
 	}
 }
