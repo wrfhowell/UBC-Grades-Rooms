@@ -5,7 +5,7 @@ import Course from "./Course";
 import {InsightDataset, InsightDatasetKind} from "./IInsightFacade";
 import Num from "./Num";
 
-export default class JSONHandler {
+export default class JSONHandler{
 
 	private static parse(id: string, data: InsightFacade, jsonString: string, courseName: string): Promise<Course> {
 		let json;

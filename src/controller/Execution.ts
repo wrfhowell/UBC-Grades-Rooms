@@ -17,21 +17,28 @@ export class Execution {
 		}
 		let unorderedResults = returnSections.flat();
 		let orderedResults = this.ReturnOrderedSections(this.ReturnOrder(query), unorderedResults);
-		return orderedResults;
-		// let omg = this.ConcatDatasetIdToKeys(orderedResults, this.ReturnDatasetId(query));
-		// return omg;
+		let omg = this.ConcatDatasetIdToKeys(orderedResults, this.ReturnDatasetId(query));
+		return omg;
 	}
-	// public ConcatDatasetIdToKeys(dataset: string[], prefix: any): string[] {
-	// 	let returnSet = [];
-	// 	for (let i in dataset) {
-	// 		for (let j in Object.keys(dataset[i])) {
-	//
-	// 		}
-	// 	}
-	// }
+	public ConcatDatasetIdToKeys(dataset: string[], prefix: any): string[] {
+		let resultArray = [];
+		for (let i in dataset) {
+			let curSection: any = dataset[i];
+			let tempObj: any = {};
+			let keys = Object.keys(dataset[1]);
+			for (let j in keys) {
+				let curPropKey = keys[j];
+				let curValueToAppend = curSection[`${curPropKey}`];
+				let tempPropKey = prefix + curPropKey;
+				tempObj[tempPropKey] = curValueToAppend;
+			}
+			resultArray.push(tempObj);
+		}
+		return resultArray;
+	}
 	public ReturnDatasetId(query: any) {
 		let datasetId = query.OPTIONS.COLUMNS[0];
-		return datasetId;
+		return datasetId.substring(0,datasetId.indexOf("_") + 1);
 	}
 
 	public Execute(query: any, dataset: Course): string[] {
@@ -50,7 +57,10 @@ export class Execution {
 		return returnColumns;
 	}
 	public ReturnOrder(query: any): string {
-		return query.OPTIONS.ORDER;
+		let orderKey = query.OPTIONS.ORDER;
+		let orderKeyParsed = orderKey.split("_").pop();
+		return orderKeyParsed;
+
 	}
 	public ReturnOrderedSections(orderKey: any, sections: any) {
 		return sections.sort((a: any, b: any) => a[`${orderKey}`] - b[`${orderKey}`]);

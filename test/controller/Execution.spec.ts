@@ -281,17 +281,9 @@ describe("Execution", function () {
 		console.log(result);
 		console.log(x.ReturnColumns(query));
 	});
-	// it("test concat property key", function() {
-	// 	let query = {WHERE: {}, OPTIONS: {COLUMNS: ["courses_avg", "courses_title"], ORDER: "courses_avg"}};
-	// 	let columns = x.ReturnColumns(query);
-	// 	let results = x.ExecuteOnCourses(query, courseArray);
-	// 	console.log(results);
-	// 	console.log(Object.keys(results[1]));
-	// 	for (let i in results) {
-	// 		for (let j in Object.keys(results)) {
-	// 			let key = Object.keys(results)[j];
-	// 			let currentObject = results[i];
-	// 		}
-	// 	}
-	// });
+	it("test concat property key", function() {
+		let query = {WHERE: {}, OPTIONS: {COLUMNS: ["courses_avg", "courses_title"], ORDER: "courses_avg"}};
+		let results = x.ExecuteOnCourses(query, courseArray);
+		console.log(results);
+	});
 });
