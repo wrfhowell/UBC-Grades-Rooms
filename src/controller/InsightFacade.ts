@@ -56,9 +56,10 @@ export default class InsightFacade implements IInsightFacade {
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 		const x = new Validation();
 		const y = new Execution();
-		let dataset = new Course("test", 5);
+		let datasetId = y.ReturnDatasetId(query);
+		let dataset: Course[] = this.insightData.get(datasetId)!;
 		if (x.Validate(query)) {
-			y.Execute(query, dataset);
+			y.ExecuteOnCourses(query, dataset);
 		} else {
 			if (!x.Validate(query)) {
 				console.log("oops query broken");

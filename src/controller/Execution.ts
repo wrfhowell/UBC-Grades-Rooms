@@ -10,16 +10,44 @@ export class Execution {
 	constructor() {
 		this.type = "yes";
 	}
+	public ExecuteOnCourses(query: any, dataset: Course[]): string[] {
+		let returnSections = [];
+		for (let n in dataset) {
+			returnSections.push(this.Execute(query, dataset[n]));
+		}
+		let unorderedResults = returnSections.flat();
+		let orderedResults = this.ReturnOrderedSections(this.ReturnOrder(query), unorderedResults);
+		return orderedResults;
+		// let omg = this.ConcatDatasetIdToKeys(orderedResults, this.ReturnDatasetId(query));
+		// return omg;
+	}
+	// public ConcatDatasetIdToKeys(dataset: string[], prefix: any): string[] {
+	// 	let returnSet = [];
+	// 	for (let i in dataset) {
+	// 		for (let j in Object.keys(dataset[i])) {
+	//
+	// 		}
+	// 	}
+	// }
+	public ReturnDatasetId(query: any) {
+		let datasetId = query.OPTIONS.COLUMNS[0];
+		return datasetId;
+	}
 
 	public Execute(query: any, dataset: Course): string[] {
 		let columns = this.ReturnColumns(query);
 		let validQueriedSections = this.Query(query, dataset);
 		let unorderedResults = this.ReturnResults(columns, validQueriedSections);
-		let orderedResults = this.ReturnOrderedSections(this.ReturnOrder(query), unorderedResults);
-		return orderedResults;
+		// let orderedResults = this.ReturnOrderedSections(this.ReturnOrder(query), unorderedResults);
+		return unorderedResults;
 	}
 	public ReturnColumns(query: any): string[] {
-		return query.OPTIONS.COLUMNS;
+		let columns = query.OPTIONS.COLUMNS;
+		let returnColumns = [];
+		for (let i in columns) {
+			returnColumns.push(columns[i].split("_").pop());
+		}
+		return returnColumns;
 	}
 	public ReturnOrder(query: any): string {
 		return query.OPTIONS.ORDER;
