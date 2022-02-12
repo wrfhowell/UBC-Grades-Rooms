@@ -73,7 +73,7 @@ export class Validation {
 		if (ColumnObject !== undefined) {
 			resultOfValidateColumn = this.ValidateColumns(ColumnObject);
 		}
-		console.log("column: " + resultOfValidateColumn + " order: " + resultOfValidateOrder + resultOfOrderInColumn);
+		// console.log("column: " + resultOfValidateColumn + " order: " + resultOfValidateOrder + resultOfOrderInColumn);
 		return resultOfValidateOrder && resultOfValidateColumn && resultOfOrderInColumn;
 	}
 	public ValidateOrder(Orders: any): boolean {
@@ -184,7 +184,7 @@ export class Validation {
 		let sCompKey = Object.keys(SComparison)[0];
 		let sKeyClause = SComparison[`${sCompKey}`];
 		let skey = Object.keys(SComparison.IS)[0];
-		console.log("skey value: " + skey + "sComKey Value: " + sCompKey + "sKeyClause: " + sKeyClause);
+		// console.log("skey value: " + skey + "sComKey Value: " + sCompKey + "sKeyClause: " + sKeyClause);
 		if (sCompKey === "IS" && this.ValidateSKey(skey)) {
 			let sKeyClauseValue = sKeyClause[`${skey}`];
 			return SCompRegEx.test(sKeyClauseValue) && typeof sKeyClauseValue === "string";

@@ -1,4 +1,11 @@
-import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult,} from "./IInsightFacade";
+import {
+	IInsightFacade,
+	InsightDataset,
+	InsightDatasetKind,
+	InsightError,
+	InsightResult,
+	ResultTooLargeError,
+} from "./IInsightFacade";
 import {Validation} from "./Validation";
 import {Execution} from "./Execution";
 import JSONHandler from "./JSONHandler";
@@ -58,12 +65,17 @@ export default class InsightFacade implements IInsightFacade {
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 		const x = new Validation();
 		const y = new Execution();
-		let datasetId = y.ReturnDatasetId(query);
+		let datasetIdWithUnderscore = y.ReturnDatasetId(query);
+		let datasetId = datasetIdWithUnderscore.substring(0, datasetIdWithUnderscore.indexOf("_"));
 		let dataset: Course[] = this.insightData.get(datasetId)!;
 		if (x.Validate(query)) {
-			// let result = JSON.parse(y.ExecuteOnCourses(query, dataset));
-			// return Promise.resolve(result);
-			y.ExecuteOnCourses(query,dataset);
+			let result = y.ExecuteOnCourses(query, dataset);
+			if (result.length > 5000) {
+				return Promise.reject(new ResultTooLargeError("too many sections"));
+			}
+			let resultString = JSON.stringify(result);
+			let resultJSON = JSON.parse(resultString);
+			return Promise.resolve(resultJSON);
 		} else {
 			if (!x.Validate(query)) {
 				console.log("oops query broken");

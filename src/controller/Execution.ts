@@ -137,7 +137,7 @@ export class Execution {
 		let sCompClause = SComparison.IS;
 		let sKey = Object.keys(sCompClause)[0];
 		let sField = sKey.split("_").pop();
-		let valueToCompare = sCompClause[`${sField}`];
+		let valueToCompare = sCompClause[`${sKey}`];
 		let queriedISCase = dataset.sections.reduce((previousValue: Section[], currentValue: any) => {
 			if (currentValue[`${sField}`] === valueToCompare) {
 				previousValue.push(currentValue);
@@ -151,8 +151,10 @@ export class Execution {
 		let MComparator = Object.keys(MComparison)[0];
 		let MComparisonClause = MComparison[`${MComparator}`];
 		let mKey = Object.keys(MComparisonClause)[0];
-		let mField = mKey.split("_").pop();
-		let ValueToCompare = MComparisonClause[`${mField}`];
+		type StringKeys = Extract<keyof Section, string>;
+		let mFieldString = mKey.split("_").pop();
+		let mField = mFieldString;
+		let ValueToCompare = MComparisonClause[`${mKey}`];
 		switch(MComparator) {
 			case "GT" : {
 				let queriedGTCase = dataset.sections.reduce((previousValue: Section[], currentValue: any) => {
