@@ -102,6 +102,12 @@ describe("Execution", function () {
 		let results = x.ReturnResults(["avg", "dept", "title"], sections);
 		expect(results).to.deep.equal([{avg: 50.3, dept: "cpsc", title: "math200"}]);
 	});
+	it("Should return correct sections - test EQ", function () {
+		let sections = x.ExecuteMComparison({EQ: {avg: 69.2}}, courseArray[0]);
+		let results = x.ReturnResults(["avg", "dept", "title"], sections);
+		console.log(results);
+		expect(results).to.deep.equal([{avg: 69.2, dept: "cpsc", title: "engl112"}]);
+	});
 	it("Should return correct sections - test SComparison", function () {
 		let sections = x.ExecuteSComparison({IS: {dept: "cpsc"}}, courseArray[0]);
 		let results = x.ReturnResults(["uuid", "title", "avg", "dept"], sections);
@@ -111,6 +117,8 @@ describe("Execution", function () {
 			{uuid: "2351", title: "math200", avg: 50.3, dept: "cpsc"}
 		]
 		);
+		let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "title", "avg"], ORDER: "title"}};
+		let results1 = x.Execute(query, courseArray[1]);
 	});
 	it("Should merge two Sections[]", function () {
 		let sections1 = [section1, section2];
@@ -163,7 +171,7 @@ describe("Execution", function () {
 				ORDER: "avg"
 			}
 		};
-		let result = x.Execute(query, courseArray[0]);
+		let result = x.ReturnOrderedSections(x.ReturnOrder(query),x.Execute(query, courseArray[0]));
 		expect(result).deep.equal([
 			{dept: "cpsc", avg: 69.2},
 			{dept: "cpsc", avg: 87.5}
@@ -174,15 +182,15 @@ describe("Execution", function () {
 			WHERE: {
 				OR: [
 					{
-						AND: [
+						OR: [
 							{
-								GT: {
-									avg: 70
+								LT: {
+									avg: 51
 								}
 							},
 							{
 								IS: {
-									dept: "cpsc"
+									dept: "math"
 								}
 							}
 						]
@@ -198,24 +206,92 @@ describe("Execution", function () {
 				COLUMNS: [
 					"dept",
 					"id",
-					"avg"
+					"avg",
 				],
 				ORDER: "avg"
 			}
 		};
-		let result = x.Execute(query, courseArray[0]);
+		let result = x.ExecuteOnCourses(query, courseArray);
+		console.log(result);
 		expect(result).to.deep.equal([
-			{dept: "cpsc", id: "324", avg: 69.2},
-			{dept: "cpsc", id: "001", avg: 87.5}
+			{dept: "phys", id: "123", avg: 23.3},
+			{dept: "phys", id: "321", avg: 45.2},
+			{dept: "cpsc", id: "234", avg: 50.3},
+			{dept: "cpsc", id: "324", avg: 69.2}
 		]);
 	});
 	it("Should return right order", function () {
 		let query = {WHERE: {}, OPTIONS: {COLUMNS: ["avg", "title"], ORDER: "avg"}};
-		let result = x.Execute(query, courseArray[0]);
+		let result = x.ReturnOrderedSections(x.ReturnOrder(query),x.Execute(query, courseArray[0]));
+		console.log(result);
 		expect(result).to.deep.equal([
 			{avg: 50.3, title: "math200"},
 			{avg: 69.2, title: "engl112"},
 			{avg: 87.5, title: "cpsc121"}
 		]);
 	});
+	it("Should return right sections - complex query v2", function () {
+		let query = {
+			WHERE: {
+				OR: [
+					{
+						AND: [
+							{
+								GT: {
+									avg: 20
+								}
+							},
+							{
+								LT: {
+									avg: 100
+								}
+							}
+						]
+					},
+					{
+						EQ: {
+							avg: 69.2
+						}
+					}
+				]
+			},
+			OPTIONS: {
+				COLUMNS: [
+					"dept",
+					"id",
+					"avg",
+				],
+				ORDER: "id"
+			}
+		};
+		let list = [courseArray[1]];
+		let result = x.ExecuteOnCourses(query, list);
+		console.log(result[0]);
+	});
+	it("Should return correct queried sections after parsing for dataset id from first Option column", function() {
+		let query = {WHERE: {}, OPTIONS: {COLUMNS: ["courses_avg", "courses_title"], ORDER: "courses_avg"}};
+		let datasetIdUnParsed = query.OPTIONS.COLUMNS[0];
+		let datasetId = datasetIdUnParsed.substring(0, datasetIdUnParsed.indexOf("_"));
+		let courses: Course[] = dataset.get(datasetId)!;
+		console.log(courses);
+		console.log("datasetIdUnparsed is: " + datasetIdUnParsed);
+		console.log("datasetId is: " + datasetId);
+		console.log("datasetId is: " + datasetId);
+		let result = x.ExecuteOnCourses(query, courses);
+		console.log(result);
+		console.log(x.ReturnColumns(query));
+	});
+	// it("test concat property key", function() {
+	// 	let query = {WHERE: {}, OPTIONS: {COLUMNS: ["courses_avg", "courses_title"], ORDER: "courses_avg"}};
+	// 	let columns = x.ReturnColumns(query);
+	// 	let results = x.ExecuteOnCourses(query, courseArray);
+	// 	console.log(results);
+	// 	console.log(Object.keys(results[1]));
+	// 	for (let i in results) {
+	// 		for (let j in Object.keys(results)) {
+	// 			let key = Object.keys(results)[j];
+	// 			let currentObject = results[i];
+	// 		}
+	// 	}
+	// });
 });
