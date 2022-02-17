@@ -3,7 +3,7 @@ import Section from "./Section";
 import Course from "./Course";
 import {Validation} from "./Validation";
 
-let ValidationObject = new Validation();
+let ValidationObject = new Validation("");
 export class Execution {
 	private type = "yes";
 
@@ -17,21 +17,31 @@ export class Execution {
 		}
 		let unorderedResults = returnSections.flat();
 		let orderedResults = this.ReturnOrderedSections(this.ReturnOrder(query), unorderedResults);
-		return orderedResults;
-		// let omg = this.ConcatDatasetIdToKeys(orderedResults, this.ReturnDatasetId(query));
-		// return omg;
+		let concatenatedResults = this.ConcatDatasetIdToKeys(orderedResults, this.ReturnDatasetId(query));
+		return concatenatedResults;
 	}
-	// public ConcatDatasetIdToKeys(dataset: string[], prefix: any): string[] {
-	// 	let returnSet = [];
-	// 	for (let i in dataset) {
-	// 		for (let j in Object.keys(dataset[i])) {
-	//
-	// 		}
-	// 	}
-	// }
+	public ConcatDatasetIdToKeys(dataset: string[], prefix: any): string[] {
+		let resultArray = [];
+		for (let i in dataset) {
+			let curSection: any = dataset[i];
+			let tempObj: any = {};
+			let keys = Object.keys(dataset[1]);
+			for (let j in keys) {
+				let curPropKey = keys[j];
+				let curValueToAppend = curSection[`${curPropKey}`];
+				let tempPropKey = prefix + curPropKey;
+				tempObj[tempPropKey] = curValueToAppend;
+			}
+			resultArray.push(tempObj);
+		}
+		return resultArray;
+	}
 	public ReturnDatasetId(query: any) {
 		let datasetId = query.OPTIONS.COLUMNS[0];
-		return datasetId;
+		if (datasetId === undefined) {
+			return false;
+		}
+		return datasetId.substring(0,datasetId.indexOf("_") + 1);
 	}
 
 	public Execute(query: any, dataset: Course): string[] {
@@ -50,7 +60,10 @@ export class Execution {
 		return returnColumns;
 	}
 	public ReturnOrder(query: any): string {
-		return query.OPTIONS.ORDER;
+		let orderKey = query.OPTIONS.ORDER;
+		let orderKeyParsed = orderKey.split("_").pop();
+		return orderKeyParsed;
+
 	}
 	public ReturnOrderedSections(orderKey: any, sections: any) {
 		return sections.sort((a: any, b: any) => a[`${orderKey}`] - b[`${orderKey}`]);
@@ -127,7 +140,7 @@ export class Execution {
 		let sCompClause = SComparison.IS;
 		let sKey = Object.keys(sCompClause)[0];
 		let sField = sKey.split("_").pop();
-		let valueToCompare = sCompClause[`${sField}`];
+		let valueToCompare = sCompClause[`${sKey}`];
 		let queriedISCase = dataset.sections.reduce((previousValue: Section[], currentValue: any) => {
 			if (currentValue[`${sField}`] === valueToCompare) {
 				previousValue.push(currentValue);
@@ -141,8 +154,10 @@ export class Execution {
 		let MComparator = Object.keys(MComparison)[0];
 		let MComparisonClause = MComparison[`${MComparator}`];
 		let mKey = Object.keys(MComparisonClause)[0];
-		let mField = mKey.split("_").pop();
-		let ValueToCompare = MComparisonClause[`${mField}`];
+		type StringKeys = Extract<keyof Section, string>;
+		let mFieldString = mKey.split("_").pop();
+		let mField = mFieldString;
+		let ValueToCompare = MComparisonClause[`${mKey}`];
 		switch(MComparator) {
 			case "GT" : {
 				let queriedGTCase = dataset.sections.reduce((previousValue: Section[], currentValue: any) => {
@@ -189,4 +204,27 @@ export class Execution {
 		let difference = datasetSections.filter((y: any) => !valuesToBeExcluded.includes(y));
 		return difference;
 	}
+	// public ExecuteApply(ApplyClause: any, Dataset: string[]): string[] {
+	// 	let applyKeys = [];
+	// }
+	// public TriageApply(ApplyClause: any, Dataset: string[]): string[] {
+	// 	let applyKey = ApplyClause.
+	// 		switch (ApplyClause);
+	// }
+	//
+	// public ApplyCount(CountClause: any, Dataset: string[]): string[] {
+	// 	return [];
+	// }
+	// public ApplyMax(MaxClause: any, Dataset: string[]): string[] {
+	// 	return [];
+	// }
+	// public ApplyMin(MinClause: any, Dataset: string[]): string[] {
+	// 	return [];
+	// }
+	// public ApplyAvg(AvgClause: any, Dataset: string[]): string[] {
+	// 	return [];
+	// }
+	// public ApplySum(SumClause: any, Dataset: string[]): string[] {
+	// 	return [];
+	// }
 }

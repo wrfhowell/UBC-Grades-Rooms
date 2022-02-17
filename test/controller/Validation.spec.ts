@@ -18,7 +18,7 @@ import {Execution} from "../../src/controller/Execution";
 chai.use(chaiAsPromised);
 
 
-let ValidationObject = new Validation();
+let ValidationObject = new Validation("courses");
 let ExecutionObject = new Execution();
 
 describe("Validation", function () {
@@ -192,6 +192,7 @@ describe("Validation", function () {
 			describe("Mkey", function() {
 				it("Should match regex for Mkey", function () {
 					let x = ValidationObject.ValidateMKey("courses_avg");
+					console.log(x);
 					expect(x).to.be.true;
 				});
 

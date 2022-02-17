@@ -185,39 +185,39 @@ describe("Execution", function () {
 						OR: [
 							{
 								LT: {
-									avg: 51
+									courses_avg: 51
 								}
 							},
 							{
 								IS: {
-									dept: "math"
+									courses_dept: "math"
 								}
 							}
 						]
 					},
 					{
 						EQ: {
-							avg: 69.2
+							courses_avg: 69.2
 						}
 					}
 				]
 			},
 			OPTIONS: {
 				COLUMNS: [
-					"dept",
-					"id",
-					"avg",
+					"courses_dept",
+					"courses_id",
+					"courses_avg",
 				],
-				ORDER: "avg"
+				ORDER: "courses_avg"
 			}
 		};
 		let result = x.ExecuteOnCourses(query, courseArray);
 		console.log(result);
 		expect(result).to.deep.equal([
-			{dept: "phys", id: "123", avg: 23.3},
-			{dept: "phys", id: "321", avg: 45.2},
-			{dept: "cpsc", id: "234", avg: 50.3},
-			{dept: "cpsc", id: "324", avg: 69.2}
+			{courses_dept: "phys", courses_id: "123", courses_avg: 23.3},
+			{courses_dept: "phys", courses_id: "321", courses_avg: 45.2},
+			{courses_dept: "cpsc", courses_id: "234", courses_avg: 50.3},
+			{courses_dept: "cpsc", courses_id: "324", courses_avg: 69.2}
 		]);
 	});
 	it("Should return right order", function () {
@@ -238,35 +238,35 @@ describe("Execution", function () {
 						AND: [
 							{
 								GT: {
-									avg: 20
+									courses_avg: 20
 								}
 							},
 							{
 								LT: {
-									avg: 100
+									courses_avg: 100
 								}
 							}
 						]
 					},
 					{
 						EQ: {
-							avg: 69.2
+							courses_avg: 69.2
 						}
 					}
 				]
 			},
 			OPTIONS: {
 				COLUMNS: [
-					"dept",
-					"id",
-					"avg",
+					"courses_dept",
+					"courses_id",
+					"courses_avg",
 				],
-				ORDER: "id"
+				ORDER: "courses_dept"
 			}
 		};
 		let list = [courseArray[1]];
 		let result = x.ExecuteOnCourses(query, list);
-		console.log(result[0]);
+		console.log(result);
 	});
 	it("Should return correct queried sections after parsing for dataset id from first Option column", function() {
 		let query = {WHERE: {}, OPTIONS: {COLUMNS: ["courses_avg", "courses_title"], ORDER: "courses_avg"}};
@@ -280,18 +280,19 @@ describe("Execution", function () {
 		let result = x.ExecuteOnCourses(query, courses);
 		console.log(result);
 		console.log(x.ReturnColumns(query));
+		let temp = dataset.get("what");
+		console.log(temp);
 	});
 	// it("test concat property key", function() {
-	// 	let query = {WHERE: {}, OPTIONS: {COLUMNS: ["courses_avg", "courses_title"], ORDER: "courses_avg"}};
-	// 	let columns = x.ReturnColumns(query);
+	// 	let query = {WHERE: {GT:{courses_avg: 0}}, OPTIONS: {COLUMNS: ["courses_avg", "courses_title"], ORDER: "courses_avg"}};
 	// 	let results = x.ExecuteOnCourses(query, courseArray);
 	// 	console.log(results);
-	// 	console.log(Object.keys(results[1]));
-	// 	for (let i in results) {
-	// 		for (let j in Object.keys(results)) {
-	// 			let key = Object.keys(results)[j];
-	// 			let currentObject = results[i];
-	// 		}
-	// 	}
+	// 	let line = "courses_avg";
+	// 	let lineSplit = line.substring(line.indexOf("_") + 1, line.length);
+	// 	let field = line.split("_").pop();
+	// 	console.log(results.length);
+	// 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// 	// @ts-ignore
+	// 	console.log(course1.sections[0][`${field}`]);
 	// });
 });

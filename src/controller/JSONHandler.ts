@@ -5,7 +5,7 @@ import Course from "./Course";
 import {InsightDataset, InsightDatasetKind} from "./IInsightFacade";
 import Num from "./Num";
 
-export default class JSONHandler{
+export default class JSONHandler {
 
 	private static parse(id: string, data: InsightFacade, jsonString: string, courseName: string): Promise<Course> {
 		let json;
@@ -19,24 +19,24 @@ export default class JSONHandler{
 
 
 		let course = new Course(courseName, json["rank"]);
-		console.log("6");
+		// console.log("6");
 		if (Object.prototype.hasOwnProperty.call(json,"result")) {
 			if(json.result.length > 0) {
 				for (let oneSection of json.result) {
-					let section = new Section(oneSection["dept"],
-						oneSection["id"],
-						oneSection["avg"],
-						oneSection["instructor"],
-						oneSection["title"],
-						oneSection["pass"],
-						oneSection["fail"],
-						oneSection["audit"],
-						oneSection["uuid"]);
+					let section = new Section(oneSection["Subject"],
+						oneSection["Course"],
+						oneSection["Avg"],
+						oneSection["Professor"],
+						oneSection["Title"],
+						oneSection["Pass"],
+						oneSection["Fail"],
+						oneSection["Audit"],
+						oneSection["id"]);
 
 					if (oneSection["Section"] === "Overall") {
 						section.year = 1900;
 					} else {
-						section.year = oneSection["year"];
+						section.year = oneSection["Year"];
 					}
 					course.addSection(section);
 				}
@@ -89,8 +89,7 @@ export default class JSONHandler{
 		let courseName: string;
 		let numRows: number = 0;
 
-
-		console.log("2");
+		// console.log("2");
 
 		jszip.loadAsync(content, {base64: true})
 			.then((zip: any) => {
@@ -99,7 +98,8 @@ export default class JSONHandler{
 					file.async("string")
 						.then((jsonString: any) => {
 							JSONHandler.parse(id, data, jsonString, courseName).then((course: Course) => {
-								console.log("10");
+								// console.log("10");
+
 								if (course !== null) {
 									courseArray.push(course);
 								}

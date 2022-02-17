@@ -1,4 +1,12 @@
-import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult,} from "./IInsightFacade";
+import {
+	IInsightFacade,
+	InsightDataset,
+	InsightDatasetKind,
+	InsightError,
+	InsightResult,
+	ResultTooLargeError,
+} from "./IInsightFacade";
+
 import AddDatasetHelper from "./AddDatasetHelper";
 import JSONHandler from "./JSONHandler";
 import {Validation} from "./Validation";
@@ -18,7 +26,8 @@ export default class InsightFacade implements IInsightFacade {
 	public addedDatasets: InsightDataset[] = [];
 	// array of added ids
 	public idArray: string[] = [];
-
+	public curDatasetId = "";
+  
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
 	}
@@ -57,12 +66,26 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public performQuery(query: unknown): Promise<InsightResult[]> {
-		const x = new Validation();
 		const y = new Execution();
-		let datasetId = y.ReturnDatasetId(query);
+		let datasetIdWithUnderscore = y.ReturnDatasetId(query);
+		let datasetId = datasetIdWithUnderscore.substring(0, datasetIdWithUnderscore.indexOf("_"));
+		const x = new Validation(datasetId);
+		this.curDatasetId = datasetId;
 		let dataset: Course[] = this.insightData.get(datasetId)!;
+		if (datasetIdWithUnderscore === false) {
+			return Promise.reject(new InsightError("No Options or Columns"));
+		}
+		if (dataset === undefined) {
+			return Promise.reject(new InsightError("dataset not added"));
+		}
 		if (x.Validate(query)) {
-			y.ExecuteOnCourses(query, dataset);
+			let result = y.ExecuteOnCourses(query, dataset);
+			if (result.length > 5000) {
+				return Promise.reject(new ResultTooLargeError("too many sections"));
+			}
+			let resultString = JSON.stringify(result);
+			let resultJSON = JSON.parse(resultString);
+			return Promise.resolve(resultJSON);
 		} else {
 			if (!x.Validate(query)) {
 				console.log("oops query broken");
