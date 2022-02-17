@@ -28,12 +28,9 @@ export default class InsightFacade implements IInsightFacade {
 	// array of added ids
 	public idArray: string[] = [];
 	public curDatasetId = "";
-  
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
 	}
-
-
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		return new Promise<string[]>((resolve,reject) => {
 			// check if id is valid according to spec
