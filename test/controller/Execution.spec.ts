@@ -238,35 +238,35 @@ describe("Execution", function () {
 						AND: [
 							{
 								GT: {
-									avg: 20
+									courses_avg: 20
 								}
 							},
 							{
 								LT: {
-									avg: 100
+									courses_avg: 100
 								}
 							}
 						]
 					},
 					{
 						EQ: {
-							avg: 69.2
+							courses_avg: 69.2
 						}
 					}
 				]
 			},
 			OPTIONS: {
 				COLUMNS: [
-					"dept",
-					"id",
-					"avg",
+					"courses_dept",
+					"courses_id",
+					"courses_avg",
 				],
-				ORDER: "id"
+				ORDER: "courses_dept"
 			}
 		};
 		let list = [courseArray[1]];
 		let result = x.ExecuteOnCourses(query, list);
-		console.log(result[0]);
+		console.log(result);
 	});
 	it("Should return correct queried sections after parsing for dataset id from first Option column", function() {
 		let query = {WHERE: {}, OPTIONS: {COLUMNS: ["courses_avg", "courses_title"], ORDER: "courses_avg"}};
@@ -280,6 +280,8 @@ describe("Execution", function () {
 		let result = x.ExecuteOnCourses(query, courses);
 		console.log(result);
 		console.log(x.ReturnColumns(query));
+		let temp = dataset.get("what");
+		console.log(temp);
 	});
 	// it("test concat property key", function() {
 	// 	let query = {WHERE: {GT:{courses_avg: 0}}, OPTIONS: {COLUMNS: ["courses_avg", "courses_title"], ORDER: "courses_avg"}};

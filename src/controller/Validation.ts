@@ -5,14 +5,16 @@ import chaiAsPromised from "chai-as-promised";
 chai.use(chaiAsPromised);
 
 export class Validation {
-	private type = "";
+	private curDatasetId = "";
 	private ColumnsOfCurrentQuery = [];
-	constructor () {
-		this.type = "yes";
+	constructor (datasetId: string) {
+		this.curDatasetId = datasetId;
 	}
 	public Validate (query: any) {
 		let queryKeys = Object.keys(query);
-		let modelKeys = ["WHERE", "OPTIONS"];
+		if (queryKeys.indexOf("WHERE") === -1 || queryKeys.indexOf("WHERE") === -1) {
+			return false;
+		}
 		if (queryKeys.length === 2 && Object.keys(query)[0] === "WHERE" && Object.keys(query)[1] === "OPTIONS") {
 			return this.ValidateWhere(query.WHERE) && this.ValidateOptions(query.OPTIONS);
 		} else {
@@ -28,28 +30,6 @@ export class Validation {
 			return false;
 		}
 		return true;
-	}
-
-	public ParseJsonObject(JsonObject: any): any {
-		let query = JsonObject;
-
-		function createAST(key: string, value: string) {
-			return key + value;
-		}
-
-		function traverse(queryObject: any, func: (key: string, value: string) => void) {
-			for (let i in queryObject) {
-				func.apply(null, [i, queryObject[i]]);
-				if (queryObject[i] !== null && typeof (queryObject[i]) === "object") {
-					traverse(queryObject[i], func);
-				}
-			}
-		}
-		if (this.isValidJSONQuery(query)) {
-			traverse(query, createAST);
-		} else {
-			return InsightError;
-		}
 	}
 	public ValidateWhere(WhereClause: any): boolean {
 		if (JSON.stringify(WhereClause) === "{}") {
@@ -97,11 +77,19 @@ export class Validation {
 	public ValidateMKey(Mkey: any): boolean {
 		let MField = new RegExp("avg|pass|fail|audit|year");
 		const mKey = new RegExp("[^_]+" + "_" + MField.source);
+		let datasetIdOfMKey = Mkey.substring(0,Mkey.indexOf("_"));
+		if (datasetIdOfMKey !== this.curDatasetId) {
+			return false;
+		}
 		return mKey.test(Mkey);
 	}
 	public ValidateSKey(Skey: any): boolean {
 		let SField = new RegExp("dept|id|instructor|title|uuid");
 		const sKey = new RegExp("[^_]+" + "_" + SField.source);
+		let datasetIdOfMKey = Skey.substring(0,Skey.indexOf("_"));
+		if (datasetIdOfMKey !== this.curDatasetId) {
+			return false;
+		}
 		return sKey.test(Skey);
 	}
 	public ValidateInputString(inputString: any): boolean {

@@ -3,7 +3,7 @@ import Section from "./Section";
 import Course from "./Course";
 import {Validation} from "./Validation";
 
-let ValidationObject = new Validation();
+let ValidationObject = new Validation("");
 export class Execution {
 	private type = "yes";
 
@@ -17,8 +17,8 @@ export class Execution {
 		}
 		let unorderedResults = returnSections.flat();
 		let orderedResults = this.ReturnOrderedSections(this.ReturnOrder(query), unorderedResults);
-		let omg = this.ConcatDatasetIdToKeys(orderedResults, this.ReturnDatasetId(query));
-		return omg;
+		let concatenatedResults = this.ConcatDatasetIdToKeys(orderedResults, this.ReturnDatasetId(query));
+		return concatenatedResults;
 	}
 	public ConcatDatasetIdToKeys(dataset: string[], prefix: any): string[] {
 		let resultArray = [];
@@ -38,6 +38,9 @@ export class Execution {
 	}
 	public ReturnDatasetId(query: any) {
 		let datasetId = query.OPTIONS.COLUMNS[0];
+		if (datasetId === undefined) {
+			return false;
+		}
 		return datasetId.substring(0,datasetId.indexOf("_") + 1);
 	}
 
@@ -201,4 +204,27 @@ export class Execution {
 		let difference = datasetSections.filter((y: any) => !valuesToBeExcluded.includes(y));
 		return difference;
 	}
+	// public ExecuteApply(ApplyClause: any, Dataset: string[]): string[] {
+	// 	let applyKeys = [];
+	// }
+	// public TriageApply(ApplyClause: any, Dataset: string[]): string[] {
+	// 	let applyKey = ApplyClause.
+	// 		switch (ApplyClause);
+	// }
+	//
+	// public ApplyCount(CountClause: any, Dataset: string[]): string[] {
+	// 	return [];
+	// }
+	// public ApplyMax(MaxClause: any, Dataset: string[]): string[] {
+	// 	return [];
+	// }
+	// public ApplyMin(MinClause: any, Dataset: string[]): string[] {
+	// 	return [];
+	// }
+	// public ApplyAvg(AvgClause: any, Dataset: string[]): string[] {
+	// 	return [];
+	// }
+	// public ApplySum(SumClause: any, Dataset: string[]): string[] {
+	// 	return [];
+	// }
 }
