@@ -291,8 +291,6 @@ describe("Execution", function () {
 	// 	let lineSplit = line.substring(line.indexOf("_") + 1, line.length);
 	// 	let field = line.split("_").pop();
 	// 	console.log(results.length);
-	// 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// 	// @ts-ignore
 	// 	console.log(course1.sections[0][`${field}`]);
 	// });
 });
