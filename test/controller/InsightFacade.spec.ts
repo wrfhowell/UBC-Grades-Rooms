@@ -31,6 +31,7 @@ type Error = "InsightError" | "ResultTooLargeError" | "NotFoundError";
 chai.use(chaiAsPromised);
 
 describe("InsightFacade", function () {
+	this.timeout(10000);
 	// Promise should fulfill an array of currently added InsightDatasets, and will only fulfill.
 
 	let courses: string;
@@ -330,7 +331,7 @@ describe("InsightFacade", function () {
 					return facade.removeDataset("courses");
 				})
 				.then((removed) => {
-					expect(removed).to.be.instanceof(String);
+					// expect(removed).to.be.instanceof(String);
 					expect(removed).to.equal("courses");
 				})
 				.then(() => {
@@ -354,7 +355,7 @@ describe("InsightFacade", function () {
 					return facade.removeDataset("courses");
 				})
 				.then((removed) => {
-					expect(removed).to.be.instanceof(String);
+					// expect(removed).to.be.instanceof(String);
 					expect(removed).to.equal("courses");
 				})
 				.then(() => {
@@ -378,14 +379,14 @@ describe("InsightFacade", function () {
 					return facade.removeDataset("courses");
 				})
 				.then((removed) => {
-					expect(removed).to.be.instanceof(String);
+					// expect(removed).to.be.instanceof(String);
 					expect(removed).to.equal("courses");
 				})
 				.then(() => {
 					return facade.removeDataset(("courses1"));
 				})
 				.then((removed) => {
-					expect(removed).to.be.instanceof(String);
+					// expect(removed).to.be.instanceof(String);
 					expect(removed).to.equal("courses1");
 				})
 				.then(() => {

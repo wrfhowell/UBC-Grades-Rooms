@@ -2,24 +2,24 @@ import InsightFacade from "./InsightFacade";
 import JSZip from "jszip";
 import Section from "./Section";
 import Course from "./Course";
-import {InsightDataset, InsightDatasetKind} from "./IInsightFacade";
-import Num from "./Num";
+import {InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
+import {rejects} from "assert";
+import DiskHelper from "./DiskHelper";
 
 export default class JSONHandler{
 
-	private static parse(id: string, data: InsightFacade, jsonString: string, courseName: string): Promise<Course> {
+	private static parse(id: string, data: InsightFacade, jsonString: string, courseName: string): any {
 		let json;
 
 
 		try {
 			json = JSON.parse(jsonString);
 		} catch (error) {
-			return Promise.reject(null);
+			return null;
 		}
 
 
 		let course = new Course(courseName, json["rank"]);
-		console.log("6");
 		if (Object.prototype.hasOwnProperty.call(json,"result")) {
 			if(json.result.length > 0) {
 				for (let oneSection of json.result) {
@@ -42,42 +42,9 @@ export default class JSONHandler{
 				}
 			}
 		}
-
-
-		return Promise.resolve(course);
+		return course;
 	}
 
-	// public static getContent(
-	// 	id: string,
-	// 	content: string,
-	// 	data: InsightFacade,
-	// 	resolve: (value: any) => any, reject: (value: any) => any): any {
-	//
-	//
-	// 	let jszip: JSZip = new JSZip();
-	// 	let courseName: string;
-	// 	console.log("2");
-	// 	jszip.loadAsync(content, {base64: true})
-	// 		.then((zip: any) => {
-	// 			console.log("3");
-	// 			let jsonStrings: Array<Promise<string>> = [];
-	//
-	// 			zip.folder("courses")?.forEach( async (relativePath: any, file: any) => {
-	//
-	// 				jsonStrings.push(file.async("string"));
-	// 				courseName = file.name;
-	// 			});
-	// 			console.log("4");
-	// 			return Promise.all(jsonStrings);
-	// 		})
-	// 		.then ((jsonStrings: string[]) => {
-	// 			console.log("5");
-	// 			return resolve(JSONHandler.parse(id, data, jsonStrings, courseName));
-	// 		})
-	// 		.catch((e) => {
-	// 			return reject(new InsightError(e));
-	// 		});
-	// }
 	public static getContent(
 		id: string,
 		content: string,
@@ -85,41 +52,62 @@ export default class JSONHandler{
 		resolve: (value: any) => any, reject: (value: any) => any): any {
 
 		let jszip: JSZip = new JSZip();
-		let courseArray: Course[] = [];
 		let courseName: string;
 		let numRows: number = 0;
 
-
-		console.log("2");
-
 		jszip.loadAsync(content, {base64: true})
 			.then((zip: any) => {
-				zip.folder("courses")?.forEach(async (relativePath: any, file: any) => {
-					courseName = file.name;
-					file.async("string")
-						.then((jsonString: any) => {
-							JSONHandler.parse(id, data, jsonString, courseName).then((course: Course) => {
-								console.log("10");
-								if (course !== null) {
-									courseArray.push(course);
-								}
-								numRows = course.sections.length + numRows;
-							});
-						});
+				let promiseArray: Array<Promise<any>> = [];
+				zip.folder("courses")?.forEach( async (relativePath: any, file: any) => {
+					if (file !== null) {
+						courseName = file.name;
+						let course = JSONHandler.loadFile(file, id, data, courseName);
+						promiseArray.push(course);
+					}
 				});
+				return Promise.all(promiseArray);
 			})
-			.then( () => {
-				for (let course of courseArray) {
+			.then((courses: Course[]) => {
+				courses.filter((oneCourse) => {
+					return oneCourse !== null;
+				});
+				for (let course of courses) {
 					numRows = course.sections.length + numRows;
 				}
-				data.insightData.set(id, courseArray);
+				data.insightData.set(id, courses);
 				data.addedDatasets.push({id: id, kind: InsightDatasetKind.Courses, numRows: numRows} as
 					InsightDataset);
 				data.idArray.push(id);
+				if (courses.length > 0) {
+					return resolve(DiskHelper.saveToDisk(id, courses, data));
+				} else {
+					return reject(new InsightError("empty"));
+				}
+			}).then((c) => {
 				return resolve(data.idArray);
 			})
 			.catch((e) => {
-				return reject(e);
+				return reject(new InsightError("invalid zip"));
 			});
 	}
+
+	public static loadFile(file: any, id: string, data: InsightFacade, courseName: string): Promise<any> {
+		return new Promise ((resolve,reject) => {
+			if (courseName === null) {
+				reject(null);
+			} else {
+				file.async("string")
+					.then((jsonString: any) => {
+						let course = JSONHandler.parse(id,data,jsonString, courseName);
+						if (course !== null) {
+							resolve(course);
+						} else {
+							resolve(null);
+						}
+					});
+			}
+		});
+	}
 }
+
+
