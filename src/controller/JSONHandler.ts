@@ -6,7 +6,7 @@ import {InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade
 import {rejects} from "assert";
 import DiskHelper from "./DiskHelper";
 
-export default class JSONHandler{
+export default class JSONHandler {
 
 	private static parse(id: string, data: InsightFacade, jsonString: string, courseName: string): any {
 		let json;
@@ -17,26 +17,24 @@ export default class JSONHandler{
 		} catch (error) {
 			return null;
 		}
-
-
 		let course = new Course(courseName, json["rank"]);
 		if (Object.prototype.hasOwnProperty.call(json,"result")) {
 			if(json.result.length > 0) {
 				for (let oneSection of json.result) {
-					let section = new Section(oneSection["dept"],
-						oneSection["id"],
-						oneSection["avg"],
-						oneSection["instructor"],
-						oneSection["title"],
-						oneSection["pass"],
-						oneSection["fail"],
-						oneSection["audit"],
-						oneSection["uuid"]);
+					let section = new Section(oneSection["Subject"],
+						oneSection["Course"],
+						oneSection["Avg"],
+						oneSection["Professor"],
+						oneSection["Title"],
+						oneSection["Pass"],
+						oneSection["Fail"],
+						oneSection["Audit"],
+						oneSection["id"]);
 
 					if (oneSection["Section"] === "Overall") {
 						section.year = 1900;
 					} else {
-						section.year = oneSection["year"];
+						section.year = oneSection["Year"];
 					}
 					course.addSection(section);
 				}

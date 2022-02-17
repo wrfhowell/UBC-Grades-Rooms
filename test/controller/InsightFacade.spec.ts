@@ -463,7 +463,7 @@ describe("InsightFacade", function () {
 		});
 
 		function assertResult(actual: any, expected: Awaited<Output>): void {
-			expect(actual).to.deep.equal(expected);
+			expect(actual).to.have.deep.members(expected);
 		}
 
 		function assertError(actual: any, expected: Error): void {
