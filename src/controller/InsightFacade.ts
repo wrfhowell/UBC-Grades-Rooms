@@ -4,6 +4,7 @@ import {
 	InsightDatasetKind,
 	InsightError,
 	InsightResult,
+	NotFoundError,
 	ResultTooLargeError,
 } from "./IInsightFacade";
 
@@ -27,12 +28,9 @@ export default class InsightFacade implements IInsightFacade {
 	// array of added ids
 	public idArray: string[] = [];
 	public curDatasetId = "";
-  
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
 	}
-
-
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		return new Promise<string[]>((resolve,reject) => {
 			// check if id is valid according to spec
@@ -51,18 +49,43 @@ export default class InsightFacade implements IInsightFacade {
 			}
 
 			// check if content string is invalid
-			if (content === null || content === "") {
+			if (content === null || content === "" || content === undefined) {
 				return reject(new InsightError("invalid content name"));
 			}
 
-			console.log("1");
 			// get content from zip file and parse into dataset
 			return JSONHandler.getContent(id, content, this, resolve, reject);
 		});
 	}
 
 	public removeDataset(id: string): Promise<string> {
-		return Promise.reject("Not implemented.");
+		return new Promise((resolve,reject) => {
+			// check if id is valid according to spec
+			if (!AddDatasetHelper.validIdCheck(id)) {
+				return reject(new InsightError("Invalid ID Inputted"));
+			}
+
+			// check if id has not been added
+			if (!AddDatasetHelper.idAddedAlready(id, this)){
+				return reject(new NotFoundError("id Never added"));
+			}
+
+			this.insightData.delete(id);
+			this.idArray.forEach((item, index) => {
+				if (item === id){
+					this.idArray.splice(index, 1);
+				}
+			});
+			this.addedDatasets.forEach((item, index) => {
+				if (item.id === id) {
+					this.addedDatasets.splice(index,1);
+				}
+			});
+			resolve(id);
+
+			// TODO cache removal
+
+		});
 	}
 
 	public performQuery(query: unknown): Promise<InsightResult[]> {
