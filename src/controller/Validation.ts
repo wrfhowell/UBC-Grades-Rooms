@@ -10,6 +10,7 @@ export class Validation {
 	constructor (datasetId: string) {
 		this.curDatasetId = datasetId;
 	}
+
 	public Validate (query: any) {
 		let queryKeys = Object.keys(query);
 		if (queryKeys.indexOf("WHERE") === -1 || queryKeys.indexOf("WHERE") === -1) {
@@ -31,6 +32,7 @@ export class Validation {
 		}
 		return true;
 	}
+
 	public ValidateWhere(WhereClause: any): boolean {
 		if (JSON.stringify(WhereClause) === "{}") {
 			return true;
@@ -38,6 +40,7 @@ export class Validation {
 			return this.ValidateFilters(WhereClause);
 		}
 	}
+
 	public ValidateOptions(Options: any): boolean {
 		// if (Object.keys(Options)[0] !== "OPTIONS") {
 		// 	return false;
@@ -56,9 +59,11 @@ export class Validation {
 		// console.log("column: " + resultOfValidateColumn + " order: " + resultOfValidateOrder + resultOfOrderInColumn);
 		return resultOfValidateOrder && resultOfValidateColumn && resultOfOrderInColumn;
 	}
+
 	public ValidateOrder(Orders: any): boolean {
 		return this.ValidateKey(Orders);
 	}
+
 	public ValidateColumns(Columns: any): boolean {
 		// if (Object.keys(Columns)[0] !== "COLUMNS") {
 		// 	return false;
@@ -71,11 +76,13 @@ export class Validation {
 		}
 		return true;
 	}
+
 	public ValidateKey(key: any): boolean {
 		return this.ValidateMKey(key) || this.ValidateSKey(key);
 	}
+
 	public ValidateMKey(Mkey: any): boolean {
-		let MField = new RegExp("avg|pass|fail|audit|year");
+		let MField = new RegExp("avg|pass|fail|audit|year|lat|lon|seats");
 		const mKey = new RegExp("[^_]+" + "_" + MField.source);
 		let datasetIdOfMKey = Mkey.substring(0,Mkey.indexOf("_"));
 		if (datasetIdOfMKey !== this.curDatasetId) {
@@ -83,8 +90,9 @@ export class Validation {
 		}
 		return mKey.test(Mkey);
 	}
+
 	public ValidateSKey(Skey: any): boolean {
-		let SField = new RegExp("dept|id|instructor|title|uuid");
+		let SField = new RegExp("dept|id|instructor|title|uuid|fullname|shortname|number");
 		const sKey = new RegExp("[^_]+" + "_" + SField.source);
 		let datasetIdOfMKey = Skey.substring(0,Skey.indexOf("_"));
 		if (datasetIdOfMKey !== this.curDatasetId) {
@@ -92,14 +100,17 @@ export class Validation {
 		}
 		return sKey.test(Skey);
 	}
+
 	public ValidateInputString(inputString: any): boolean {
 		const InputString = new RegExp("[^*]*");
 		return InputString.test(inputString);
 	}
+
 	public ValidateIdString(idString: any): boolean {
 		const IdStringRegEx = new RegExp("[^_]+");
 		return IdStringRegEx.test(idString);
 	}
+
 	public ValidateFilters(Filter: any): boolean {
 		let propertyKey = Object.keys(Filter)[0];
 		if (this.ValidateLogic(propertyKey)) {
@@ -116,10 +127,12 @@ export class Validation {
 		}
 		return false;
 	}
+
 	public ValidateMComparitor(MComparitor: any): boolean{
 		let mComparator = new RegExp("GT|LT|EQ");
 		return mComparator.test(MComparitor);
 	}
+
 	public ValidateLogicComparison(LogicComparison: any): boolean{
 		let LogicComparisonKey = Object.keys(LogicComparison)[0];
 		if (this.ValidateLogic(LogicComparisonKey) && Object.keys(LogicComparison).length === 1) {
@@ -153,9 +166,11 @@ export class Validation {
 		}
 		return false;
 	}
+
 	public ValidateLogic(Logic: any): boolean {
 		return Logic === "AND" || Logic === "OR";
 	}
+
 	public ValidateMComparison(MComparison: any): boolean {
 		let mComparatorKey = Object.keys(MComparison)[0];
 		if (this.ValidateMComparitor(mComparatorKey)) {
@@ -167,6 +182,7 @@ export class Validation {
 		}
 		return false;
 	}
+
 	public ValidateSComparison(SComparison: any): boolean {
 		let SCompRegEx = new RegExp("`*`?" + "[^*]*" + "`*`?");
 		let sCompKey = Object.keys(SComparison)[0];
@@ -179,6 +195,7 @@ export class Validation {
 		}
 		return false;
 	}
+
 	public ValidateNegation(Negation: any): boolean {
 		if (Object.keys(Negation)[0] !== "NOT") {
 			return false;
