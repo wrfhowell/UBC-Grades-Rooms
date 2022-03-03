@@ -88,7 +88,6 @@ export default class JSONHandler {
 		let courseName: string;
 		let numRows: number = 0;
 
-
 		// console.log("2");
 
 		jszip.loadAsync(content, {base64: true})
@@ -99,6 +98,7 @@ export default class JSONHandler {
 						.then((jsonString: any) => {
 							JSONHandler.parse(id, data, jsonString, courseName).then((course: Course) => {
 								// console.log("10");
+
 								if (course !== null) {
 									courseArray.push(course);
 								}

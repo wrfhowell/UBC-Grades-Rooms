@@ -6,10 +6,11 @@ import {
 	InsightResult,
 	ResultTooLargeError,
 } from "./IInsightFacade";
+
+import AddDatasetHelper from "./AddDatasetHelper";
+import JSONHandler from "./JSONHandler";
 import {Validation} from "./Validation";
 import {Execution} from "./Execution";
-import JSONHandler from "./JSONHandler";
-import AddDatasetHelper from "./AddDatasetHelper";
 import Course from "./Course";
 
 
@@ -26,6 +27,7 @@ export default class InsightFacade implements IInsightFacade {
 	// array of added ids
 	public idArray: string[] = [];
 	public curDatasetId = "";
+  
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
 	}
