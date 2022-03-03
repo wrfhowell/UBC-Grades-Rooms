@@ -12,7 +12,7 @@ module.exports = {
 	"plugins": [
 		"@typescript-eslint",
 		"jsdoc",
-		"import",
+		"import"
 	],
 	"extends": [
 		"eslint:recommended",
@@ -22,16 +22,24 @@ module.exports = {
 	],
 	"overrides": [
 		{
-			"files": ["**/*.spec.ts"],
+			"files": [
+				"**/*.spec.ts"
+			],
 			"rules": {
 				"max-lines": "off",
 				"max-lines-per-function": "off",
-				"no-unused-expressions": "off"
+				"no-unused-expressions": "off",
+				"max-nested-callbacks": "off"
 			}
 		}
 	],
 	"rules": {
-		"@typescript-eslint/array-type": ["error", {"default": "array-simple"}],
+		"@typescript-eslint/array-type": [
+			"error",
+			{
+				"default": "array-simple"
+			}
+		],
 		"@typescript-eslint/ban-types": [
 			"error",
 			{
@@ -41,17 +49,36 @@ module.exports = {
 					"Boolean": "Avoid using the `Boolean` type. Did you mean `boolean`?",
 					"Number": "Avoid using the `Number` type. Did you mean `number`?",
 					"String": "Avoid using the `String` type. Did you mean `string`?",
-					"Symbol": "Avoid using the `Symbol` type. Did you mean `symbol`?",
+					"Symbol": "Avoid using the `Symbol` type. Did you mean `symbol`?"
 				}
 			}
 		],
-		"@typescript-eslint/explicit-member-accessibility": ["error", {"overrides": {"constructors": "off"}}],
+		"@typescript-eslint/explicit-member-accessibility": [
+			"error",
+			{
+				"overrides": {
+					"constructors": "off"
+				}
+			}
+		],
 		"@typescript-eslint/explicit-module-boundary-types": "off",
 		"@typescript-eslint/consistent-type-assertions": "error",
 		"@typescript-eslint/naming-convention": [
 			"error",
-			{"selector": "typeLike", "format": ["camelCase", "PascalCase"]},
-			{"selector": "variable", "format": ['camelCase', "PascalCase", "UPPER_CASE"]}
+			{
+				"selector": "typeLike",
+				"format": [
+					"PascalCase"
+				]
+			},
+			{
+				"selector": "variable",
+				"format": [
+					"camelCase",
+					"PascalCase",
+					"UPPER_CASE"
+				]
+			}
 		],
 		"@typescript-eslint/no-explicit-any": "off",
 		"@typescript-eslint/no-inferrable-types": "off",
@@ -66,16 +93,50 @@ module.exports = {
 		"@typescript-eslint/type-annotation-spacing": "error",
 		"@typescript-eslint/unified-signatures": "error",
 		"array-bracket-spacing": "error",
-		"arrow-parens": ["error", "always"],
-		"brace-style": ["error", "1tbs"],
+		"arrow-parens": [
+			"error",
+			"always"
+		],
+		"brace-style": [
+			"error",
+			"1tbs"
+		],
 		"constructor-super": "error",
 		"curly": "error",
 		"eol-last": "error",
-		"eqeqeq": ["error", "always", {"null": "ignore"}],
-		"indent": ["error", "tab", {"ignoreComments": true, "SwitchCase": 1}],
-		"max-len": ["error", {"code": 120, "ignoreComments": true}],
-		"max-lines-per-function": ["error", {"max": 50, "skipComments": true}],
-		"max-lines": ["error", 300],
+		"eqeqeq": [
+			"error",
+			"always",
+			{
+				"null": "ignore"
+			}
+		],
+		"indent": [
+			"error",
+			"tab",
+			{
+				"ignoreComments": true,
+				"SwitchCase": 1
+			}
+		],
+		"max-len": [
+			"error",
+			{
+				"code": 120,
+				"ignoreComments": true
+			}
+		],
+		"max-lines-per-function": [
+			"error",
+			{
+				"max": 50,
+				"skipComments": true
+			}
+		],
+		"max-lines": [
+			"error",
+			300
+		],
 		"new-parens": "error",
 		"no-await-in-loop": "error",
 		"no-bitwise": "error",
@@ -96,18 +157,52 @@ module.exports = {
 		"no-unused-vars": "off",
 		"no-var": "error",
 		"prefer-const": "off",
-		"quote-props": ["error",  "consistent-as-needed"],
-		"quotes": ["error", "double", {"avoidEscape": true}],
+		"quote-props": [
+			"error",
+			"consistent-as-needed"
+		],
+		"quotes": [
+			"error",
+			"double",
+			{
+				"avoidEscape": true
+			}
+		],
 		"radix": "error",
 		"semi": "error",
-		"space-before-function-paren": ["error", {"anonymous": "ignore", "named": "ignore", "asyncArrow": "always"}],
+		"space-before-function-paren": [
+			"error",
+			{
+				"anonymous": "ignore",
+				"named": "ignore",
+				"asyncArrow": "always"
+			}
+		],
 		"space-infix-ops": "error",
-		"space-unary-ops": ["error", {"words": true, "nonwords": false}],
+		"space-unary-ops": [
+			"error",
+			{
+				"words": true,
+				"nonwords": false
+			}
+		],
 		"spaced-comment": "error",
 		"use-isnan": "error",
 		"jsdoc/check-alignment": 2,
 		"jsdoc/check-indentation": 2,
 		"jsdoc/require-asterisk-prefix": 2,
 		"jsdoc/no-bad-blocks": 2,
+		"lines-between-class-members": [
+			"error",
+			"always",
+			{
+				"exceptAfterSingleLine": true
+			}
+		],
+		"max-nested-callbacks": [
+			"error",
+			2
+		],
+		"max-statements-per-line": "error"
 	}
 };

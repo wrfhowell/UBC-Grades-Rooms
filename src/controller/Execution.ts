@@ -2,6 +2,7 @@ import {InsightResult} from "./IInsightFacade";
 import Section from "./Section";
 import Course from "./Course";
 import {Validation} from "./Validation";
+import Min = Mocha.reporters.Min;
 
 let ValidationObject = new Validation("");
 export class Execution {
@@ -10,6 +11,7 @@ export class Execution {
 	constructor() {
 		this.type = "yes";
 	}
+
 	public ExecuteOnCourses(query: any, dataset: Course[]): string[] {
 		let returnSections = [];
 		for (let n in dataset) {
@@ -20,6 +22,7 @@ export class Execution {
 		let concatenatedResults = this.ConcatDatasetIdToKeys(orderedResults, this.ReturnDatasetId(query));
 		return concatenatedResults;
 	}
+
 	public ConcatDatasetIdToKeys(dataset: string[], prefix: any): string[] {
 		let resultArray = [];
 		for (let i in dataset) {
@@ -36,12 +39,13 @@ export class Execution {
 		}
 		return resultArray;
 	}
+
 	public ReturnDatasetId(query: any) {
 		let datasetId = query.OPTIONS.COLUMNS[0];
 		if (datasetId === undefined) {
 			return false;
 		}
-		return datasetId.substring(0,datasetId.indexOf("_") + 1);
+		return datasetId.substring(0, datasetId.indexOf("_") + 1);
 	}
 
 	public Execute(query: any, dataset: Course): string[] {
@@ -51,6 +55,7 @@ export class Execution {
 		// let orderedResults = this.ReturnOrderedSections(this.ReturnOrder(query), unorderedResults);
 		return unorderedResults;
 	}
+
 	public ReturnColumns(query: any): string[] {
 		let columns = query.OPTIONS.COLUMNS;
 		let returnColumns = [];
@@ -59,24 +64,29 @@ export class Execution {
 		}
 		return returnColumns;
 	}
+
 	public ReturnOrder(query: any): string {
 		let orderKey = query.OPTIONS.ORDER;
 		let orderKeyParsed = orderKey.split("_").pop();
 		return orderKeyParsed;
 
 	}
+
 	public ReturnOrderedSections(orderKey: any, sections: any) {
 		return sections.sort((a: any, b: any) => a[`${orderKey}`] - b[`${orderKey}`]);
 	}
+
 	public Query(query: any, dataset: Course): any {
 		return this.ExecuteWhere(query.WHERE, dataset);
 	}
+
 	public ExecuteWhere(WhereClause: any, dataset: Course): any {
 		if (JSON.stringify(WhereClause) === "{}") {
 			return dataset.sections;
 		}
 		return this.ExecuteFilter(WhereClause, dataset);
 	}
+
 	public ReturnResults(columns: string[], queriedSections: Section[]) {
 		let result = [];
 		let curSection: any = {};
@@ -91,6 +101,7 @@ export class Execution {
 		}
 		return result;
 	}
+
 	public ExecuteFilter(Filter: any, dataset: Course): any {
 		let propertyKey = Object.keys(Filter)[0];
 		if (ValidationObject.ValidateLogic(propertyKey)) {
@@ -111,7 +122,7 @@ export class Execution {
 	public ExecuteLogicComparison(LogicComparison: any, dataset: Course): any[] {
 		let logicComparator = Object.keys(LogicComparison)[0];
 		let logicCompClause = LogicComparison[`${logicComparator}`];
-		switch(logicComparator) {
+		switch (logicComparator) {
 			case "AND": {
 				let intersectANDCase = [];
 				let x = [];
@@ -132,7 +143,8 @@ export class Execution {
 				let union = unionORCase.reduce((a: any, b: any) => Array.from(new Set(a.concat(b))));
 				return union;
 			}
-			default: return [];
+			default:
+				return [];
 		}
 	}
 
@@ -158,7 +170,7 @@ export class Execution {
 		let mFieldString = mKey.split("_").pop();
 		let mField = mFieldString;
 		let ValueToCompare = MComparisonClause[`${mKey}`];
-		switch(MComparator) {
+		switch (MComparator) {
 			case "GT" : {
 				let queriedGTCase = dataset.sections.reduce((previousValue: Section[], currentValue: any) => {
 					if (currentValue[`${mField}`] > ValueToCompare) {
@@ -189,7 +201,8 @@ export class Execution {
 				return queriedEQCase;
 				break;
 			}
-			default: return [];
+			default:
+				return [];
 		}
 	}
 
@@ -204,27 +217,4 @@ export class Execution {
 		let difference = datasetSections.filter((y: any) => !valuesToBeExcluded.includes(y));
 		return difference;
 	}
-	// public ExecuteApply(ApplyClause: any, Dataset: string[]): string[] {
-	// 	let applyKeys = [];
-	// }
-	// public TriageApply(ApplyClause: any, Dataset: string[]): string[] {
-	// 	let applyKey = ApplyClause.
-	// 		switch (ApplyClause);
-	// }
-	//
-	// public ApplyCount(CountClause: any, Dataset: string[]): string[] {
-	// 	return [];
-	// }
-	// public ApplyMax(MaxClause: any, Dataset: string[]): string[] {
-	// 	return [];
-	// }
-	// public ApplyMin(MinClause: any, Dataset: string[]): string[] {
-	// 	return [];
-	// }
-	// public ApplyAvg(AvgClause: any, Dataset: string[]): string[] {
-	// 	return [];
-	// }
-	// public ApplySum(SumClause: any, Dataset: string[]): string[] {
-	// 	return [];
-	// }
 }

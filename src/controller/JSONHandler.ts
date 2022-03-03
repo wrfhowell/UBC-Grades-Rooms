@@ -3,7 +3,6 @@ import JSZip from "jszip";
 import Section from "./Section";
 import Course from "./Course";
 import {InsightDataset, InsightDatasetKind} from "./IInsightFacade";
-import Num from "./Num";
 
 export default class JSONHandler {
 
