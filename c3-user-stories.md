@@ -35,19 +35,15 @@ When: the user uploads the invalid file into the upload box of our web UI.
 Then: the system tries to load the invalid file into the server but outputs an error message and prevents the invalid file from being loaded. 
 
 ## Others
-You may provide any additional user stories + DoDs in this section for general TA feedback.  
-Note: These will not be graded.
 
-## User Story 2
-As a \<role\>, I want to \<goal\>, so that \<benefit\>.
+## User Story 3
+As a system administrator for this web application, I want to be able to navigate to a separate page of the website to access add Dataset privileges, so that I can add new Datasets with updated information. 
 
 
 #### Definitions of Done(s)
-Scenario 1: \<The name for the behaviour that will be described\>  
-Given: \<Some initial application state (precondition)\>  
-When: \<The user do some series of action\>  
-Then: \<Some outcome state is expected (post-condition)\>
+###### Scenario 1: The user clicks on the correct link 
+Given: the user navigates to the section of the Web UI that has the link to the admin page.
+When: the user clicks on the link.
+Then: the page changes for the user, allowing for expanded dataset adding capabilities.
 
-## Others
-You may provide any additional user stories + DoDs in this section for general TA feedback.  
-Note: These will not be graded.
+
