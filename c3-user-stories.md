@@ -25,9 +25,9 @@ As a system administrator for this web application, I want to be able to add new
 
 #### Definitions of Done(s)
 ###### Scenario 1: The Dataset added is in JSON format, and is a valid file 
-Given: the user has accessed the administor tab of our web UI, and has a valid dataset file stored locally.
-When: the user uploads the valid file into the upload box of our web UI.
-Then: the system loads the valid file into the server followed by a load success message, and now can be accessed by students to perform queries on. 
+Given: the user has accessed the administor tab of our web UI, and has a valid dataset file stored locally. //
+When: the user uploads the valid file into the upload box of our web UI. //
+Then: the system loads the valid file into the server followed by a load success message, and now can be accessed by students to perform queries on. //
 
 ###### Scenario 2: The Dataset added is not in JSON format, or is an invalid file
 Given: the user has accessed the administor tab of our web UI, and has a dataset file stored locally.
