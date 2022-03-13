@@ -7,9 +7,10 @@ export class Transformations {
 		this.groupMap = new Map<string, string[]>();
 	}
 
-	public ExecuteTransformations(TransformationsClause: any, Dataset: string[]): any {
-		let groupMap = this.ExecuteGroup(TransformationsClause.GROUP, Dataset);
-		let result = this.ExecuteApply(TransformationsClause.APPLY, groupMap, TransformationsClause.GROUP);
+	public ExecuteTransformations(TransformationsClause: any, Dataset: any): any {
+		let groupMap = this.ExecuteGroup(TransformationsClause.TRANSFORMATIONS.GROUP, Dataset);
+		let result = this.ExecuteApply(TransformationsClause.TRANSFORMATIONS.APPLY, groupMap);
+		return this.FlattenMap(result);
 	}
 
 	public ExecuteGroup(Group: any, Dataset: string[]): any {
@@ -20,8 +21,8 @@ export class Transformations {
 			}
 			return key;
 		}
-		let groupedMap: Map<string, any>;
-		groupedMap = new Map<string, any>();
+		let groupedMap: Map<string, string[]>;
+		groupedMap = new Map<string, string[]>();
 		for (let i of Dataset) {
 			let currKey = formKey(i, Group);
 			let mapValRef = groupedMap.get(currKey);
@@ -36,49 +37,43 @@ export class Transformations {
 		return groupedMap;
 	}
 
-	// public ExecuteOneGroup(OneGroup: any, Dataset: string[]): any {
-	//
-	// }
-
-	public ExecuteApply(ApplyRules: any, groupMap: Map<string, any>, Groups: any): any {
+	public ExecuteApply(ApplyRules: any, groupMap: Map<string, any>): any {
 		let resultMap = groupMap;
-		for (let i in ApplyRules) {
-			resultMap = this.TriageApply(ApplyRules[i], resultMap, Groups);
-		}
-		return this.FlattenMap(resultMap, Groups);
+		ApplyRules.forEach((element: any) => {
+			resultMap = this.TriageApply(element, resultMap);
+		});
+		// return this.FlattenMap(resultMap, Groups);
+		return resultMap;
 	}
 
-	public FlattenMap(resultMap: Map<string, any>, Groups: string[]) {
+	public FlattenMap(resultMap: Map<string, any>) {
 		let resultArray = [];
 		for (const [key, value] of resultMap.entries()) {
-			let dummyObj: any = {};
-			for (let i in Groups) {
-				dummyObj[Groups[i]] = value[0][Groups[i]];
-			}
+			let dummyObj = Object.assign({}, value[0]);
 			resultArray.push(dummyObj);
 		}
 		return resultArray;
 	}
 
-	public TriageApply(ApplyClause: any, groupMap: Map<string, any>, Groups: any): any {
+	public TriageApply(ApplyClause: any, groupMap: Map<string, any>): any {
 		let applyKey = Object.keys(ApplyClause)[0];
-		let applyTokenClause = ApplyClause[`${applyKey}`];
+		let applyTokenClause = ApplyClause[applyKey];
 		let applyToken = Object.keys(applyTokenClause)[0];
 		switch (applyToken) {
 			case "MAX" : {
-				return this.ApplyMax(ApplyClause, groupMap, Groups, applyKey);
+				return this.ApplyMax(applyTokenClause, groupMap, applyKey);
 			}
 			case "MIN" : {
-				return this.ApplyMin(ApplyClause, groupMap, Groups, applyKey);
+				return this.ApplyMin(applyTokenClause, groupMap, applyKey);
 			}
 			case "COUNT" : {
-				return this.ApplyCount(ApplyClause, groupMap, Groups, applyKey);
+				return this.ApplyCount(applyTokenClause, groupMap, applyKey);
 			}
 			case "AVG" : {
-				return this.ApplyAvg(ApplyClause, groupMap, Groups, applyKey);
+				return this.ApplyAvg(applyTokenClause, groupMap, applyKey);
 			}
 			case "SUM" : {
-				return this.ApplySum(ApplyClause, groupMap, Groups, applyKey);
+				return this.ApplySum(applyTokenClause, groupMap, applyKey);
 			}
 			default:
 				return [];
@@ -86,11 +81,23 @@ export class Transformations {
 		return applyKey;
 	}
 
-	public ApplyCount(Clause: any, groupMap: Map<string, any>, Groups: string[], ApplyKey: any): string[] {
-		return [];
+	public ApplyCount(Clause: any, groupMap: Map<string, any>, ApplyKey: any) {
+		let keyToCount = Clause.COUNT;
+		for (const [key, value] of groupMap.entries()) {
+			let currValue = value.reduce((a: any, b: any) => {
+				if (!a.includes(b[keyToCount])) {
+					a.push(b[keyToCount]);
+				}
+				return a;
+			}, []).length;
+			for (let i in value) {
+				value[i][ApplyKey] = currValue;
+			}
+		}
+		return groupMap;
 	}
 
-	public ApplyMax(Clause: any, groupMap: Map<string, any>, Groups: string[], ApplyKey: any) {
+	public ApplyMax(Clause: any, groupMap: Map<string, any>, ApplyKey: any) {
 		let keyToMax = Clause.MAX;
 		for (const [key, value] of groupMap.entries()) {
 			let currValue = value.reduce((a: any, b: any) => {
@@ -98,13 +105,15 @@ export class Transformations {
 					a = b[keyToMax];
 				}
 				return a;
-			}, 0);
-			value[ApplyKey] = currValue;
+			}, -Infinity);
+			for (let i in value) {
+				value[i][ApplyKey] = currValue;
+			}
 		}
 		return groupMap;
 	}
 
-	public ApplyMin(Clause: any, groupMap: Map<string, any>, Groups: string[], ApplyKey: any) {
+	public ApplyMin(Clause: any, groupMap: Map<string, any>, ApplyKey: any) {
 		let keyToMin = Clause.MIN;
 		for (const [key, value] of groupMap.entries()) {
 			let currValue = value.reduce((a: any, b: any) => {
@@ -112,13 +121,15 @@ export class Transformations {
 					a = b[keyToMin];
 				}
 				return a;
-			}, 0);
-			value[ApplyKey] = currValue;
+			}, +Infinity);
+			for (let i in value) {
+				value[i][ApplyKey] = currValue;
+			}
 		}
 		return groupMap;
 	}
 
-	public ApplyAvg(Clause: any, groupMap: Map<string, any>, Groups: any, ApplyKey: any) {
+	public ApplyAvg(Clause: any, groupMap: Map<string, any>, ApplyKey: any) {
 		let keyToAvg = Clause.AVG;
 		for (const [key, value] of groupMap.entries()) {
 			let currValue = value.reduce((a: any, b: any) => {
@@ -126,20 +137,23 @@ export class Transformations {
 				return a;
 			}, 0);
 			currValue = currValue / value.length;
-			value[ApplyKey] = currValue;
+			for (let i in value) {
+				value[i][ApplyKey] = currValue;
+			}
 		}
 		return groupMap;
 	}
 
-	public ApplySum(Clause: any, groupMap: Map<string, any>, Groups: string[], ApplyKey: any) {
+	public ApplySum(Clause: any, groupMap: Map<string, any>, ApplyKey: any) {
 		let keyToAvg = Clause.SUM;
 		for (const [key, value] of groupMap.entries()) {
 			let currValue = value.reduce((a: any, b: any) => {
 				a = a + b[keyToAvg];
 				return a;
 			}, 0);
-			currValue = currValue / value.length;
-			value[ApplyKey] = currValue;
+			for (let i in value) {
+				value[i][ApplyKey] = currValue;
+			}
 		}
 		return groupMap;
 	}

@@ -3,8 +3,11 @@ import Section from "./Section";
 import Course from "./Course";
 import {Validation} from "./Validation";
 import Min = Mocha.reporters.Min;
+import {Transformations} from "./Transformations";
 
 let ValidationObject = new Validation("");
+let TransformationsObject = new Transformations();
+
 export class Execution {
 	private type = "yes";
 
@@ -15,12 +18,33 @@ export class Execution {
 	public ExecuteOnCourses(query: any, dataset: Course[]): string[] {
 		let returnSections = [];
 		for (let n in dataset) {
-			returnSections.push(this.Execute(query, dataset[n]));
+			returnSections.push(this.ExecuteWhere(query.WHERE, dataset[n]));
 		}
 		let unorderedResults = returnSections.flat();
-		let orderedResults = this.ReturnOrderedSections(this.ReturnOrder(query), unorderedResults);
-		let concatenatedResults = this.ConcatDatasetIdToKeys(orderedResults, this.ReturnDatasetId(query));
+		if (query.TRANSFORMATIONS) {
+			unorderedResults = TransformationsObject.ExecuteTransformations(
+				query, this.ReturnAllResults(unorderedResults));
+		}
+		let orderedResults = this.ExecuteOrder(query, unorderedResults);
+		let resultsByColumn = this.ReturnResults(this.ReturnColumns(query), orderedResults);
+		let concatenatedResults = this.ConcatDatasetIdToKeys(resultsByColumn, this.ReturnDatasetId(query));
 		return concatenatedResults;
+	}
+
+	public ExecuteOrder(query: any, dataset: any) {
+		let order = query.OPTIONS.ORDER;
+		let orderedResults = [];
+		if (typeof order === "object") {
+			orderedResults = this.ReturnOrderedSectionsWithDir(order.keys, order.dir, dataset);
+		}
+		if (typeof order === "string") {
+			orderedResults = this.ReturnOrderedSections(this.ReturnOrder(query), dataset);
+		}
+		if (orderedResults.length === 0) {
+			return dataset;
+		} else {
+			return dataset;
+		}
 	}
 
 	public ConcatDatasetIdToKeys(dataset: string[], prefix: any): string[] {
@@ -48,13 +72,12 @@ export class Execution {
 		return datasetId.substring(0, datasetId.indexOf("_") + 1);
 	}
 
-	public Execute(query: any, dataset: Course): string[] {
-		let columns = this.ReturnColumns(query);
-		let validQueriedSections = this.Query(query, dataset);
-		let unorderedResults = this.ReturnResults(columns, validQueriedSections);
-		// let orderedResults = this.ReturnOrderedSections(this.ReturnOrder(query), unorderedResults);
-		return unorderedResults;
-	}
+	// public Execute(query: any, dataset: Course): string[] {
+	// 	let columns = this.ReturnColumns(query);
+	// 	let validQueriedSections = this.Query(query, dataset);
+	// 	// let orderedResults = this.ReturnResults(columns, validQueriedSections);
+	// 	return validQueriedSections;
+	// }
 
 	public ReturnColumns(query: any): string[] {
 		let columns = query.OPTIONS.COLUMNS;
@@ -65,19 +88,47 @@ export class Execution {
 		return returnColumns;
 	}
 
-	public ReturnOrder(query: any): string {
+	public ReturnOrder(query: any) {
 		let orderKey = query.OPTIONS.ORDER;
 		let orderKeyParsed = orderKey.split("_").pop();
 		return orderKeyParsed;
-
 	}
 
 	public ReturnOrderedSections(orderKey: any, sections: any) {
-		return sections.sort((a: any, b: any) => a[`${orderKey}`] - b[`${orderKey}`]);
+		if (this.ReturnKeyType(orderKey) === "number") {
+			return sections.sort((a: any, b: any) => a[orderKey] - b[orderKey]);
+		} else if (this.ReturnKeyType(orderKey) === "string") {
+			return sections.sort((a: any, b: any) => a[orderKey].localeCompare(b[orderKey]));
+		}
 	}
 
-	public Query(query: any, dataset: Course): any {
-		return this.ExecuteWhere(query.WHERE, dataset);
+	public ReturnKeyType(key: any) {
+		let stringTypes = ["dept", "id", "instructor", "title", "uuid", "fullname", "shortname", "number",
+			"name", "address", "type", "furniture", "href"];
+		let numberTypes = ["avg", "pass", "fail", "audit", "year", "lat", "lon", "seats"];
+		if (stringTypes.includes(key)) {
+			return "string";
+		} else {
+			return "number";
+		}
+		return "error";
+	}
+
+	public ReturnOrderedSectionsWithDir(orderKeys: any, dir: any, sections: any) {
+		let sortedSections = sections;
+		if (dir === "UP") {
+			orderKeys.forEach((val: any) => {
+				sortedSections = sortedSections.sort((a: any, b: any) => a[val] - b[val]);
+			});
+			return sortedSections;
+		} else if (dir === "DOWN") {
+			orderKeys.forEach((val: any) => {
+				sortedSections = sortedSections.sort((a: any, b: any) => b[val] - a[val]);
+			});
+			return sortedSections;
+		} else {
+			return false;
+		}
 	}
 
 	public ExecuteWhere(WhereClause: any, dataset: Course): any {
@@ -87,18 +138,33 @@ export class Execution {
 		return this.ExecuteFilter(WhereClause, dataset);
 	}
 
-	public ReturnResults(columns: string[], queriedSections: Section[]) {
+	public ReturnResults(columns: string[], queriedSections: any) {
 		let result = [];
 		let curSection: any = {};
 		for (let i in queriedSections) {
 			for (let n in columns) {
 				let dummySection: any = queriedSections[i];
 				let curColumnId = columns[n];
-				curSection[`${curColumnId}`] = (dummySection[`${curColumnId}`]);
+				curSection[curColumnId] = (dummySection[curColumnId]);
 			}
 			result.push(curSection);
 			curSection = {};
 		}
+		return result;
+	}
+
+	public ReturnAllResults(queriedSections: any){
+		let result: any = [];
+		let curSection: any = {};
+		queriedSections.forEach((val: any) => {
+			let columns = Object.keys(val);
+			columns.forEach((key: any) => {
+				let keyWithoutUnderscore = key.replace(/_/g, "");
+				curSection[keyWithoutUnderscore] = val[keyWithoutUnderscore];
+			});
+			result.push(curSection);
+			curSection = {};
+		});
 		return result;
 	}
 
@@ -121,7 +187,7 @@ export class Execution {
 
 	public ExecuteLogicComparison(LogicComparison: any, dataset: Course): any[] {
 		let logicComparator = Object.keys(LogicComparison)[0];
-		let logicCompClause = LogicComparison[`${logicComparator}`];
+		let logicCompClause = LogicComparison[logicComparator];
 		switch (logicComparator) {
 			case "AND": {
 				let intersectANDCase = [];

@@ -84,6 +84,14 @@ describe("Checkpoint 2 Expansion", function () {
 			console.log(sum);
 			expect(sum).to.equal(6);
 		});
+		it("Should give correct Sum from GroupMap", function() {
+			let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg", "title", "fail"], ORDER: "avg"}};
+			let result: any = x.ExecuteOnCourses(query, courseArray);
+			let resultMap = y.ExecuteGroup(["dept"], result);
+			let applyRules = {SUM: "fail"};
+			let resultApply = y.ApplySum(applyRules, resultMap, "overallFAIL");
+			console.log(resultApply);
+		});
 		it("Should give correct Avg", function() {
 			let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg", "title"], ORDER: "avg"}};
 			let result = x.ExecuteOnCourses(query, courseArray);
@@ -96,49 +104,50 @@ describe("Checkpoint 2 Expansion", function () {
 			console.log(Number(sum / jsonResult.length).toFixed(2));
 			expect(sum / jsonResult.length).to.equal(6);
 		});
+		it("Should give correct Avg from GroupMap", function() {
+			let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg", "title", "instructor"], ORDER: "avg"}};
+			let result: any = x.ExecuteOnCourses(query, courseArray);
+			let groups = ["dept", "title", "overallAvg"];
+			let resultMap = y.ExecuteGroup(["dept"], result);
+			let applyRules = {AVG: "avg"};
+			let resultApply = y.ApplyAvg(applyRules, resultMap, "overallAvg");
+			console.log(resultApply);
+		});
 		it("Should give correct Count - grouped", function() {
-			let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg"], ORDER: "avg"}};
-			let result = x.ExecuteOnCourses(query, courseArray);
-			let unique = y.ExecuteGroup(["dept"], result);
-			let stringResult = JSON.stringify(result);
-			let jsonResult = JSON.parse(stringResult);
-			let countResult = [];
-			for (let i in unique) {
-				let curObj: any = {};
-				const count = jsonResult.reduce((prev: any, curr: any) => {
-					if (curr.dept === unique[i]) {
-						prev = prev + 1;
-					}
-					return prev;
-				}, 0);
-				curObj.dept = unique[i];
-				curObj.overallCount = count;
-				countResult.push(curObj);
-			}
-			console.log(result);
-			console.log(countResult);
+			let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg", "title", "instructor"], ORDER: "avg"}};
+			let result: any = x.ExecuteOnCourses(query, courseArray);
+			let groups = ["dept", "title", "AVG_Count"];
+			let resultMap = y.ExecuteGroup(["dept"], result);
+			let applyRules = {COUNT: "dept"};
+			let resultApply = y.ApplyCount(applyRules, resultMap, "AVG_Count");
+			console.log(resultApply);
 		});
 		it("Should give correct Max - grouped", function() {
-			let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg"], ORDER: "avg"}};
-			let result = x.ExecuteOnCourses(query, courseArray);
-			let unique = y.ExecuteGroup(["dept"], result);
-			let stringResult = JSON.stringify(result);
-			let jsonResult = JSON.parse(stringResult);
-			let MaxAvgResult = [];
-			for (let i in unique) {
-				let curObj: any = {};
-				const max = jsonResult.reduce((prev: any, curr: any) => {
-					if (curr.dept === unique[i] && curr.avg > prev) {
-						prev = curr.avg;
-					}
-					return prev;
-				}, 0);
-				curObj.dept = unique[i];
-				curObj.overallCount = max;
-				MaxAvgResult.push(curObj);
-			}
-			console.log(result);
-			console.log(MaxAvgResult);
+			let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg", "title", "instructor"], ORDER: "avg"}};
+			let result: any = x.ExecuteOnCourses(query, courseArray);
+			let groups = ["dept", "title", "Max_AVG"];
+			let resultMap = y.ExecuteGroup(["dept"], result);
+			let applyRules = {MIN: "avg"};
+			let resultApply = y.ApplyMin(applyRules, resultMap, "Min_AVG");
+			console.log(resultApply);
+		});
+		it("Should give correct AVG and MAX - grouped", function() {
+			let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg", "title", "instructor"], ORDER: "avg"}};
+			let result: any = x.ExecuteOnCourses(query, courseArray);
+			let groups = ["dept", "title", "Max_AVG"];
+			let resultMap = y.ExecuteGroup(["dept"], result);
+			let applyRules = [{Min_AVG: {MIN: "avg"}},{AVG_AVG: {AVG: "avg"}}];
+			let resultApply = y.ExecuteApply(applyRules, resultMap);
+			console.log(resultApply);
+		});
+		it("Should give correct AVG and MAX and MIN and SUM and COUNT - grouped", function() {
+			let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg", "title", "instructor"], ORDER: "avg"}};
+			let result: any = x.ExecuteOnCourses(query, courseArray);
+			let groups = ["dept", "title", "Max_AVG"];
+			let resultMap = y.ExecuteGroup(["dept"], result);
+			let applyRules = [{Min_AVG: {MIN: "avg"}},{AVG_AVG: {AVG: "avg"}}];
+			let resultApply = y.ExecuteApply(applyRules, resultMap);
+			console.log(resultApply);
 		});
 	});
 	describe("Group", function() {
@@ -175,7 +184,7 @@ describe("Checkpoint 2 Expansion", function () {
 			it("Should provide correct unique group values", function () {
 				let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg", "title"], ORDER: "avg"}};
 				let result = x.ExecuteOnCourses(query, courseArray);
-				let unique = y.ExecuteGroup(["dept"], result);
+				let unique = y.ExecuteGroup(["dept", "title"], result);
 				let test = [...new Set(result.map((item: any) => item.dept))];
 				console.log(unique);
 				console.log(test);
@@ -192,78 +201,107 @@ describe("Checkpoint 2 Expansion", function () {
 				});
 				console.log(grouped);
 			});
-		});
-		describe("Group", function() {
-			it("Should provide correct unique group values", function () {
-				let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg", "title"], ORDER: "avg"}};
-				let result = x.ExecuteOnCourses(query, courseArray);
-				let unique = y.ExecuteGroup(["dept"], result);
-				let test = [...new Set(result.map((item: any) => item.dept))];
-				console.log(unique);
-				console.log(test);
-				console.log(y.groupMap);
-				let helper: any = {};
-				let resultGrouped = result.reduce(function (r: any, o: any) {
-					let mapKeys = Array.from(y.groupMap.keys());
-					let key = "";
-					for (let i in mapKeys) {
-						key = key + mapKeys[i] + "_";
-					}
-					key = key.slice(0, -1);
-					if (!helper[key]) {
-						helper[key] = Object.assign({}, o); // create a copy of o
-						r.push(helper[key]);
-					} else {
-						helper[key].avg += o.avg;
-						helper[key].instances++;
-					}
-
-					return r;
-				}, []);
-				console.log(result);
-				console.log(helper);
+			it("Should return correct Map with grouped keys", function() {
+				let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg", "title", "instructor"], ORDER: "avg"}};
+				let result: any = x.ExecuteOnCourses(query, courseArray);
+				let groups = ["dept", "title", "overallAvg"];
+				let resultMap = y.ExecuteGroup(["dept"], result);
+				let applyRules = [{overallAvg: {AVG: "avg"}}];
+				let resultApply = y.ExecuteApply(applyRules, resultMap);
+				console.log(y.FlattenMap(resultApply));
 			});
-			describe("Group2", function () {
-				it("Should provide correct unique group values", function () {
-					let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg", "title", "instructor"], ORDER: "avg"}};
-					let result: any = x.ExecuteOnCourses(query, courseArray);
-					let groups = ["dept"];
-					let helper: Map<string, any>;
-					helper = new Map<string, any>();
-					function formKey(section: any, groupKeys: string[]) {
-						let key = "";
-						for (let i in groupKeys) {
-							key = key + section[groupKeys[i]] + "_";
+		});
+	});
+	describe("Transformations", function() {
+		it("Should return correct aggregated result array", function() {
+			let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg", "title", "instructor"], ORDER: "avg"}};
+			let result: any = x.ExecuteOnCourses(query, courseArray);
+			let groups = ["dept", "overallAvg"];
+			let transformationClause = {
+				TRANSFORMATIONS: {
+					GROUP: ["dept"], APPLY: [{overallAvg: {AVG: "avg"}}]}};
+			let resultArray = y.ExecuteTransformations(transformationClause, result);
+			let correctColumnsArray = x.ReturnResults(groups,resultArray);
+			console.log(resultArray);
+		});
+		it("Should return array from map", function() {
+			let query = {ORDER: {dir : "DOWN", keys : ["courses_dept"]}};
+			let omg = query.ORDER;
+			console.log("dir ? " + Object.keys(omg).includes("dir"));
+			console.log("keys ? " + Object.keys(omg).includes("keys"));
+		});
+		it("Should return correct aggregated result array every apply", function() {
+			let query = {
+				WHERE: {}, OPTIONS: {
+					COLUMNS: ["title","dept", "avg", "fail", "pass", "instructor"], ORDER: "avg"
+				}
+			};
+			let columns = ["dept", "title", "overallAvg", "totalFail", "totalPass", "totalInstructors"];
+			let result: any = x.ExecuteOnCourses(query, courseArray);
+			let transformationClause = {
+				TRANSFORMATIONS: {
+					GROUP: ["dept", "title"],
+					APPLY: [{
+						overallAvg: {
+							AVG: "avg"
 						}
-						return key;
-					}
-					for (let i of result) {
-						let currKey = formKey(i, groups);
-						let dummy = helper.get(currKey);
-						if (!dummy) {
-							let blank = [];
-							blank.push(i);
-							helper.set(currKey, blank);
-						} else if (dummy) {
-							dummy.push(i);
+					}, {
+						totalFail: {
+							SUM: "fail"
+						}
+					}, {
+						totalPass: {
+							SUM: "pass"
+						}
+					}, {
+						totalInstructors: {
+							COUNT: "instructor"
 						}
 					}
-					let resultArray = [];
-					for (const [key, value] of helper.entries()) {
-						let currValue = value.reduce((a: any, b: any) => {
-							a = a + b.avg;
-							return a;
-						}, 0);
-						currValue = currValue / value.length;
-						let dummyObj: any = {};
-						for (let i in groups) {
-							dummyObj[groups[i]] = value[0][groups[i]];
-						}
-						dummyObj.Overall_Avg = currValue;
-						resultArray.push(dummyObj);
+					]
+				},
+			};
+			let resultMap = y.ExecuteTransformations(transformationClause, result);
+			let resultWithColumns = x.ReturnResults(columns, resultMap);
+			let orderKeys = ["title"];
+			let dir = "UP";
+			let resultOrdered = x.ReturnOrderedSectionsWithDir(orderKeys, dir, resultWithColumns);
+			console.log(resultOrdered);
+			let resolvedTies = resultOrdered.sort((a: any, b: any) => a.dept - b.dept);
+		});
+		it("Should return array from map", function() {
+			let data = [
+				{dept: "math", title: 100, avg: 90, room: 40},
+				{dept: "math", title: 200, avg: 89, room: 50},
+				{dept: "math", title: 300, avg: 92, room: 60},
+				{dept: "astro", title: 100, avg: 90, room: 45},
+				{dept: "cooking", title: 100, avg: 93, room: 30}];
+			let sortKeys = ["dept", "title", "avg", "room"];
+			let result = data.sort((a: any, b: any) =>
+				b.dept.localeCompare(a.dept) || a.title - b.title || a.avg - b.avg || a.room - b.room
+			);
+		});
+		describe("Transformation Whole Queries", function() {
+			it("Should return correct aggregated result", function () {
+				let query = {
+					WHERE: {},
+					OPTIONS: {
+						COLUMNS: ["dept", "avg", "title", "overallAvg", "instructor"],
+						ORDER: "instructor"},
+					TRANSFORMATIONS: {GROUP: ["dept"], APPLY: [{overallAvg: {COUNT: "instructor"}}]}};
+				let result: any = x.ExecuteOnCourses(query, courseArray);
+				let groups = ["dept", "overallAvg"];
+				console.log(result);
+			});
+			it("Should return correct aggregated result - on one execute", function () {
+				let query = {
+					WHERE: {},
+					OPTIONS: {
+						COLUMNS: ["title", "dept", "overallAvg", "avg"]
 					}
-					console.log(resultArray);
-				});
+				};
+				let result: any = x.ExecuteOnCourses(query, courseArray);
+				console.log(result);
 			});
 		});
 	});
