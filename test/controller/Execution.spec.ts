@@ -109,7 +109,7 @@ describe("Execution", function () {
 		expect(results).to.deep.equal([{avg: 69.2, dept: "cpsc", title: "engl112"}]);
 	});
 	it("Should return correct sections - test SComparison", function () {
-		let sections = x.ExecuteSComparison({IS: {dept: "cpsc"}}, courseArray[0]);
+		let sections = x.ExecuteSComparison({IS: {dept: "*t*"}}, courseArray[0]);
 		let results = x.ReturnResults(["uuid", "title", "avg", "dept"], sections);
 		expect(results).to.deep.equal([
 			{uuid: "001", title: "cpsc121", avg: 87.5, dept: "cpsc"},
@@ -117,6 +117,7 @@ describe("Execution", function () {
 			{uuid: "2351", title: "math200", avg: 50.3, dept: "cpsc"}
 		]
 		);
+		console.log(results);
 		let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "title", "avg"], ORDER: "title"}};
 	});
 	it("Should merge two Sections[]", function () {

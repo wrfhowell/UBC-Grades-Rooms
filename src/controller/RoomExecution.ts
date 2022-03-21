@@ -7,19 +7,15 @@ import Room from "./Rooms";
 let ValidationObject = new Validation("");
 let TransformationsObject = new Transformations();
 
-export class Execution {
+export class RoomExecution {
 	private type = "yes";
 
 	constructor() {
 		this.type = "yes";
 	}
 
-	public ExecuteOnCourses(query: any, dataset: any): string[] {
-		let returnSections = [];
-		for (let n in dataset) {
-			returnSections.push(this.ExecuteWhere(query.WHERE, dataset[n]));
-		}
-		let unorderedResults = returnSections.flat();
+	public ExecuteOnRooms(query: any, dataset: Room[]): string[] {
+		let unorderedResults = this.ExecuteWhere(query.WHERE, dataset);
 		if (query.TRANSFORMATIONS) {
 			unorderedResults = TransformationsObject.ExecuteTransformations(
 				query, this.ReturnAllResults(unorderedResults));
@@ -30,7 +26,7 @@ export class Execution {
 		return concatenatedResults;
 	}
 
-	public ExecuteOrder(query: any, dataset: any) {
+	public ExecuteOrder(query: any, dataset: Room[]) {
 		let order = query.OPTIONS.ORDER;
 		let orderedResults = [];
 		if (typeof order === "object") {
@@ -82,8 +78,7 @@ export class Execution {
 
 	public ReturnOrder(query: any) {
 		let orderKey = query.OPTIONS.ORDER;
-		let orderKeyParsed = orderKey.split("_").pop();
-		return orderKeyParsed;
+		return orderKey.split("_").pop();
 	}
 
 	public ReturnOrderedSections(orderKey: any, sections: any) {
@@ -123,9 +118,9 @@ export class Execution {
 		}
 	}
 
-	public ExecuteWhere(WhereClause: any, dataset: any): any {
+	public ExecuteWhere(WhereClause: any, dataset: Room[]): any {
 		if (JSON.stringify(WhereClause) === "{}") {
-			return dataset.sections;
+			return dataset;
 		}
 		return this.ExecuteFilter(WhereClause, dataset);
 	}
@@ -160,7 +155,7 @@ export class Execution {
 		return result;
 	}
 
-	public ExecuteFilter(Filter: any, dataset: Course): any {
+	public ExecuteFilter(Filter: any, dataset: Room[]): any {
 		let propertyKey = Object.keys(Filter)[0];
 		if (ValidationObject.ValidateLogic(propertyKey)) {
 			return this.ExecuteLogicComparison(Filter, dataset);
@@ -177,7 +172,7 @@ export class Execution {
 		return false;
 	}
 
-	public ExecuteLogicComparison(LogicComparison: any, dataset: Course): any[] {
+	public ExecuteLogicComparison(LogicComparison: any, dataset: Room[]): any[] {
 		let logicComparator = Object.keys(LogicComparison)[0];
 		let logicCompClause = LogicComparison[logicComparator];
 		switch (logicComparator) {
@@ -206,13 +201,13 @@ export class Execution {
 		}
 	}
 
-	public ExecuteSComparison(SComparison: any, dataset: Course): any[] {
+	public ExecuteSComparison(SComparison: any, dataset: Room[]): any[] {
 		let sCompClause = SComparison.IS;
 		let sKey = Object.keys(sCompClause)[0];
 		let sField = sKey.split("_").pop();
-		let valueToCompare = new RegExp((sCompClause[`${sKey}`]).replaceAll("*", ".*"));
-		let queriedISCase = dataset.sections.reduce((previousValue: Section[], currentValue: any) => {
-			if (valueToCompare.test(currentValue[`${sField}`])) {
+		let valueToCompare = sCompClause[`${sKey}`];
+		let queriedISCase = dataset.reduce((previousValue: Section[], currentValue: any) => {
+			if (currentValue[`${sField}`] === valueToCompare) {
 				previousValue.push(currentValue);
 			}
 			return previousValue;
@@ -220,7 +215,7 @@ export class Execution {
 		return queriedISCase;
 	}
 
-	public ExecuteMComparison(MComparison: any, dataset: Course): Section[] {
+	public ExecuteMComparison(MComparison: any, dataset: Room[]): any {
 		let MComparator = Object.keys(MComparison)[0];
 		let MComparisonClause = MComparison[`${MComparator}`];
 		let mKey = Object.keys(MComparisonClause)[0];
@@ -230,7 +225,7 @@ export class Execution {
 		let ValueToCompare = MComparisonClause[`${mKey}`];
 		switch (MComparator) {
 			case "GT" : {
-				let queriedGTCase = dataset.sections.reduce((previousValue: Section[], currentValue: any) => {
+				let queriedGTCase = dataset.reduce((previousValue: Room[], currentValue: any) => {
 					if (currentValue[`${mField}`] > ValueToCompare) {
 						previousValue.push(currentValue);
 					}
@@ -240,7 +235,7 @@ export class Execution {
 				break;
 			}
 			case "LT" : {
-				let queriedLTCase = dataset.sections.reduce((previousValue: Section[], currentValue: any) => {
+				let queriedLTCase = dataset.reduce((previousValue: Room[], currentValue: any) => {
 					if (currentValue[`${mField}`] < ValueToCompare) {
 						previousValue.push(currentValue);
 					}
@@ -250,7 +245,7 @@ export class Execution {
 				break;
 			}
 			case "EQ" : {
-				let queriedEQCase = dataset.sections.reduce((previousValue: Section[], currentValue: any) => {
+				let queriedEQCase = dataset.reduce((previousValue: Room[], currentValue: any) => {
 					if (currentValue[`${mField}`] === ValueToCompare) {
 						previousValue.push(currentValue);
 					}
@@ -264,11 +259,11 @@ export class Execution {
 		}
 	}
 
-	public ExecuteNegation(Negation: any, dataset: Course): any {
+	public ExecuteNegation(Negation: any, dataset: Room[]): any {
 		let DifferenceNOTCase = [];
 		let negationClause = Negation.NOT;
 		let x = [];
-		let datasetSections = dataset.sections;
+		let datasetSections = dataset;
 		x = this.ExecuteFilter(negationClause, dataset);
 		DifferenceNOTCase.push(x);
 		let valuesToBeExcluded = DifferenceNOTCase.reduce((a: any, b: any) => Array.from(new Set(a.concat(b))));

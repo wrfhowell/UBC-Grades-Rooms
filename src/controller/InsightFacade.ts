@@ -89,16 +89,16 @@ export default class InsightFacade implements IInsightFacade {
 		});
 	}
 
-	public performQuery(query: unknown): Promise<InsightResult[]> {
+	public performQuery(query: any): Promise<InsightResult[]> {
 		const y = new Execution();
+		if (!("WHERE" in query) || !("OPTIONS" in query) || !("COLUMNS" in query.OPTIONS)) {
+			return Promise.reject(new InsightError("No Options or Columns or Where"));
+		}
 		let datasetIdWithUnderscore = y.ReturnDatasetId(query);
 		let datasetId = datasetIdWithUnderscore.substring(0, datasetIdWithUnderscore.indexOf("_"));
 		const x = new Validation(datasetId);
 		this.curDatasetId = datasetId;
 		let dataset: Course[] = this.insightData.get(datasetId)!;
-		if (datasetIdWithUnderscore === false) {
-			return Promise.reject(new InsightError("No Options or Columns"));
-		}
 		if (dataset === undefined) {
 			return Promise.reject(new InsightError("dataset not added"));
 		}

@@ -103,7 +103,20 @@ describe("Validation", function () {
 	describe("ValidateInputString", function() {
 
 		it("Should match Regex", function() {
-			ValidationObject.ValidateInputString("OMG YASS");
+			let result = ValidationObject.ValidateInputString("OMG**");
+			console.log(result);
+			let resultId = ValidationObject.ValidateIdString("___");
+			console.log(resultId);
+			let resultKey = ValidationObject.ValidateSKey("courses_name");
+			console.log(resultKey);
+			let wildCard = new RegExp(".*t.*");
+			console.log(wildCard.test("tgkhkhkkj"));
+			let omg = "*dsj*";
+			console.log(omg.replaceAll("*", ".*"));
+			let characterLiteral = new RegExp("^[^_]*_[^_]*$");
+			console.log(characterLiteral.test("_courses_dept"));
+			let characterLiteral2 = new RegExp("^[^_]+" + "_" + "(dept|href)" + "$");
+			console.log(characterLiteral2.test("courses_deptd"));
 		});
 	});
 
@@ -168,7 +181,7 @@ describe("Validation", function () {
 					expect(x).to.be.false;
 				});
 				it("Should NOT match regex for Skey - underscore at the start", function() {
-					let x = ValidationObject.ValidateIdString("_courses_dept");
+					let x = ValidationObject.ValidateSKey("_courses_dept");
 					expect(x).to.be.false;
 				});
 

@@ -261,12 +261,17 @@ describe("Checkpoint 2 Expansion", function () {
 					]
 				},
 			};
+			let resultKeys: any = [];
+			transformationClause.TRANSFORMATIONS.APPLY.forEach((a: any) => {
+				resultKeys.push(...Object.getOwnPropertyNames(a));
+			});
+			console.log(resultKeys);
 			let resultMap = y.ExecuteTransformations(transformationClause, result);
 			let resultWithColumns = x.ReturnResults(columns, resultMap);
 			let orderKeys = ["title"];
 			let dir = "UP";
 			let resultOrdered = x.ReturnOrderedSectionsWithDir(orderKeys, dir, resultWithColumns);
-			console.log(resultOrdered);
+			// console.log(resultOrdered);
 			let resolvedTies = resultOrdered.sort((a: any, b: any) => a.dept - b.dept);
 		});
 		it("Should return array from map", function() {
@@ -278,8 +283,9 @@ describe("Checkpoint 2 Expansion", function () {
 				{dept: "cooking", title: 100, avg: 93, room: 30}];
 			let sortKeys = ["dept", "title", "avg", "room"];
 			let result = data.sort((a: any, b: any) =>
-				b.dept.localeCompare(a.dept) || a.title - b.title || a.avg - b.avg || a.room - b.room
+				a.dept.localeCompare(b.dept) || a.title - b.title || a.avg - b.avg || a.room - b.room
 			);
+			console.log(result);
 		});
 		describe("Transformation Whole Queries", function() {
 			it("Should return correct aggregated result", function () {

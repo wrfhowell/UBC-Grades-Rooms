@@ -1,15 +1,15 @@
 import chai, {expect} from "chai";
 import chaiAsPromised from "chai-as-promised";
 import {describe} from "mocha";
-import Section from "../../src/controller/Section";
-import Course from "../../src/controller/Course";
 import {Execution} from "../../src/controller/Execution";
 import {Transformations} from "../../src/controller/Transformations";
 import Room from "../../src/controller/Rooms";
+import {Validation} from "../../src/controller/Validation";
+import {RoomExecution} from "../../src/controller/RoomExecution";
 
 chai.use(chaiAsPromised);
 
-let roomArray = [];
+let roomArray: any = [];
 
 let room1 = new Room(
 	"Geography","GEO", "43","GEO_43", "132 Road", 100, 200,
@@ -18,19 +18,19 @@ let room1 = new Room(
 roomArray.push(room1);
 
 let room2 = new Room(
-	"Hennings","HEN", "12","HEN_12", "56 Wesbrook ave",  23, 80,
+	"Geography","GEO ", "12","HEN_12", "56 Wesbrook ave",  23, 80,
 	67, "Big room", "Small chairs and tables", "www.henningslink.com"
 );
 roomArray.push(room2);
 
 let room3 = new Room(
-	"Nest","NES", "89","NES_89", "56 West Mall", 67.3, 34.2,
+	"Geography","GEO", "89","NES_89", "56 West Mall", 67.3, 34.2,
 	700, "Conference room", "empty", "www.amsnest.com"
 );
 roomArray.push(room3);
 
 let room4 = new Room(
-	"Biology Building","BIO", "1","BIO_1", "27 Main Mall", 12.3
+	"Birdcoop","BIR", "1","BIO_1", "27 Main Mall", 12.3
 	, 34,
 	12, "Office", "Movable chairs", "www.BIO.com"
 );
@@ -48,16 +48,130 @@ roomDataset.set("rooms", roomArray);
 
 let x = new Execution();
 let y = new Transformations();
+let v = new Validation("");
+let r = new RoomExecution();
 
 describe("Rooms Expansion", function () {
 	describe("Simple EBNF", function () {
 		it("Should give correct Count", function () {
-			return false;
+			let query = {
+				WHERE: {
+					AND: [{
+						IS: {
+							furniture: "Movable chairs"
+						}
+					}, {
+						GT: {
+							seats: 0
+						}
+					}]
+				},
+				OPTIONS: {
+					COLUMNS: [
+						"shortname",
+						"seats",
+						"lat",
+						"lon"
+					],
+					ORDER: "shortname"
+				}
+			};
+			// let result = x.ExecuteOnCourses(query, roomArray);
+			let validate = v.Validate(query);
+			console.log(validate);
+			let result = r.ExecuteOnRooms(query, roomArray);
+			console.log(result);
 		});
 	});
 	describe("Complex EBNF", function () {
 		it("Should give correct Count", function () {
-			return false;
+			let query = {
+				WHERE: {
+					AND: [{
+						GT: {
+							lat: 0
+						}
+					}, {
+						GT: {
+							seats: 0
+						}
+					}]
+				},
+				OPTIONS: {
+					COLUMNS: [
+						"shortname",
+						"furniture",
+						"maxSeats",
+						"maxLat",
+						"maxLon"
+					],
+					ORDER: {
+						dir: "DOWN",
+						keys: ["maxSeats"]
+					}
+				},
+				TRANSFORMATIONS: {
+					GROUP: ["shortname", "furniture"],
+					APPLY: [{
+						maxSeats: {
+							MAX: "seats"
+						}
+					}, {
+						maxLat: {
+							MAX: "lat"
+						}
+					}, {
+						maxLon: {
+							MAX: "lon"
+						}
+					}]
+				}
+			};
+			let resultValidate = v.Validate(query);
+			let result = r.ExecuteOnRooms(query, roomArray);
+			console.log(result);
+		});
+		it ("Should return correct key type", function() {
+			let key = "names";
+			let result = x.ReturnKeyType(key);
+			console.log(result);
+		});
+		it ("Should return initial array", function() {
+			let array1 = ["a", "b", "c", "d"];
+			let result = array1.flat();
+			console.log(result);
+		});
+		it("Should return correct EQ clause", function() {
+			let query = {GT: {seats: 300}};
+			let result = r.ExecuteFilter(query, roomArray);
+			let column = ["fullname", "number", "name", "seats"];
+			let returnedResults = r.ReturnResults(column, result);
+			console.log(returnedResults);
+		});
+		it("Should return correct WHERE clause", function() {
+			let query = {WHERE: {GT: {seats: 300}}};
+			let result = r.ExecuteWhere(query.WHERE, roomArray);
+			let column = ["fullname", "number", "name", "seats"];
+			let returnedResults = r.ReturnResults(column, result);
+			console.log(returnedResults);
+		});
+		it("Should return correct TRANSFORMATION clause", function() {
+			let query = {WHERE: {}};
+			let result = r.ExecuteWhere(query.WHERE, roomArray);
+			let column = ["fullname", "number", "name", "seats"];
+			let returnedResults = r.ReturnResults(column, result);
+			let groupQuery = {GROUP: ["fullname"]};
+			let groupedResults = y.ExecuteGroup(groupQuery,returnedResults);
+			let transformquery = {TRANSFORMATIONS: {APPLY: [{sumOfSeats: {SUM: "seats"}}]}};
+			let transformedResults = y.ExecuteApply(transformquery.TRANSFORMATIONS.APPLY, groupedResults);
+			console.log(groupedResults);
+			console.log(y.FlattenMap(transformedResults));
+		});
+		it("Should return correct Order clause", function() {
+			let query = false;
+		});
+		it("Should return correct Filter clause", function() {
+			let query = false;
 		});
 	});
 });
