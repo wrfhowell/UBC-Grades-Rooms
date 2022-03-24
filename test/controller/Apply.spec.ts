@@ -268,24 +268,48 @@ describe("Checkpoint 2 Expansion", function () {
 			console.log(resultKeys);
 			let resultMap = y.ExecuteTransformations(transformationClause, result);
 			let resultWithColumns = x.ReturnResults(columns, resultMap);
-			let orderKeys = ["title"];
-			let dir = "UP";
+			let orderKeys = ["totalFail"];
+			let dir = "dept";
 			let resultOrdered = x.ReturnOrderedSectionsWithDir(orderKeys, dir, resultWithColumns);
-			// console.log(resultOrdered);
-			let resolvedTies = resultOrdered.sort((a: any, b: any) => a.dept - b.dept);
+			console.log(resultOrdered);
 		});
 		it("Should return array from map", function() {
 			let data = [
 				{dept: "math", title: 100, avg: 90, room: 40},
 				{dept: "math", title: 200, avg: 89, room: 50},
-				{dept: "math", title: 300, avg: 92, room: 60},
-				{dept: "astro", title: 100, avg: 90, room: 45},
+				{dept: "math", title: 200, avg: 70, room: 60},
+				{dept: "pastro", title: 100, avg: 90, room: 45},
 				{dept: "cooking", title: 100, avg: 93, room: 30}];
 			let sortKeys = ["dept", "title", "avg", "room"];
 			let result = data.sort((a: any, b: any) =>
 				a.dept.localeCompare(b.dept) || a.title - b.title || a.avg - b.avg || a.room - b.room
 			);
-			console.log(result);
+
+			let result1 = data.sort((a: any, b: any) => {
+				let direction = 0, dir = "UP";
+				if (dir === "UP") {
+					direction = 1;
+				} else {
+					direction = -1;
+				}
+				sortKeys.forEach((val: any) => {
+					if (typeof b[val] === "number") {
+						if (a[val] - b[val] < 0) {
+							return -1 * direction;
+						} else if (a[val] - b[val] > 0) {
+							return 1 * direction;
+						}
+					} else if (typeof a[val] === "string") {
+						if (a[val].localeCompare(b[val]) < 0) {
+							return -1 * direction;
+						} else if (a[val].localeCompare(b[val]) > 0) {
+							return 1 * direction;
+						}
+					}
+				});
+				return 0;
+			});
+			console.log(result1);
 		});
 		describe("Transformation Whole Queries", function() {
 			it("Should return correct aggregated result", function () {
@@ -307,6 +331,39 @@ describe("Checkpoint 2 Expansion", function () {
 					}
 				};
 				let result: any = x.ExecuteOnCourses(query, courseArray);
+				console.log(result);
+			});
+			it("Should return correct result on a simple Group query", function () {
+				let query = {
+					WHERE:
+							{
+								GT: {
+									courses_avg: 0
+								}
+							},
+					OPTIONS: {
+						COLUMNS: [
+							"courses_title",
+						]
+					}
+				};
+				let transform =
+				{
+					TRANSFORMATIONS: {
+						GROUP: [
+							"courses_title"
+						],
+						APPLY: [
+							{
+								overallAvg: {
+									AVG: "courses_avg"
+								}
+							}
+						]
+					}
+				};
+				let result: any = x.ExecuteOnCourses(query, courseArray);
+				let resultAfterTransform = y.ExecuteTransformations(transform, result);
 				console.log(result);
 			});
 		});

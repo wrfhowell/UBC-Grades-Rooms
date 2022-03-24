@@ -2,7 +2,6 @@ import Section from "./Section";
 import Course from "./Course";
 import {Validation} from "./Validation";
 import {Transformations} from "./Transformations";
-import Room from "./Rooms";
 
 let ValidationObject = new Validation("");
 let TransformationsObject = new Transformations();
@@ -106,21 +105,33 @@ export class Execution {
 		return "error";
 	}
 
-	public ReturnOrderedSectionsWithDir(orderKeys: any, dir: any, sections: any) {
+	public ReturnOrderedSectionsWithDir(orderKeys: any, dir: any, sections: any): any {
 		let sortedSections = sections;
+		let direction = 0;
 		if (dir === "UP") {
-			orderKeys.forEach((val: any) => {
-				sortedSections = sortedSections.sort((a: any, b: any) => a[val] - b[val]);
-			});
-			return sortedSections;
-		} else if (dir === "DOWN") {
-			orderKeys.forEach((val: any) => {
-				sortedSections = sortedSections.sort((a: any, b: any) => b[val] - a[val]);
-			});
-			return sortedSections;
+			direction = 1;
 		} else {
-			return false;
+			direction = -1;
 		}
+		let result = sortedSections.sort((a: any, b: any) => {
+			orderKeys.forEach((val: any) => {
+				if (typeof b[val] === "number") {
+					if (a[val] - b[val] < 0) {
+						return -1 * direction;
+					} else if (a[val] - b[val] > 0) {
+						return 1 * direction;
+					}
+				} else if (typeof a[val] === "string") {
+					if (a[val].localeCompare(b[val]) < 0) {
+						return -1 * direction;
+					} else if (a[val].localeCompare(b[val]) > 0) {
+						return 1 * direction;
+					}
+				}
+			});
+			return 0;
+		});
+		return result;
 	}
 
 	public ExecuteWhere(WhereClause: any, dataset: any): any {
