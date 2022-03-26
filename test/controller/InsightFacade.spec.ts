@@ -12,6 +12,7 @@ import InsightFacade from "../../src/controller/InsightFacade";
 import {clearDisk, getContentFromArchives} from "../TestUtil";
 import {describe} from "mocha";
 import {folderTest} from "@ubccpsc310/folder-test";
+import GeolocHelper from "../../src/controller/GeolocHelper";
 
 const regexp = new RegExp("^[1-9]{0,2}$");
 
@@ -146,6 +147,13 @@ describe("InsightFacade", function () {
 					);
 				});
 		});
+
+		// it("should get lat lon", function () {
+		// 	return GeolocHelper.getGeoloc("6245%20Agronomy%20Road%20V6T%201Z4")
+		// 		.then((ret) => {
+		// 			expect(ret).to.equal(1);
+		// 		});
+		// });
 
 		it("Should reject dataset of InsightDatasetKind.Rooms", function () {
 			return facade.addDataset("courses", courses, InsightDatasetKind.Rooms)

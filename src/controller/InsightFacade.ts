@@ -13,6 +13,9 @@ import JSONHandler from "./JSONHandler";
 import {Validation} from "./Validation";
 import {Execution} from "./Execution";
 import Course from "./Course";
+import DiskHelper from "./DiskHelper";
+import Room from "./Room";
+import HTMLHandler from "./HTMLHandler";
 
 
 /**
@@ -23,6 +26,7 @@ import Course from "./Course";
 export default class InsightFacade implements IInsightFacade {
 	// key is string containing id, value is array of courses containing sections or rooms?
 	public insightData: Map<string, Course[]> = new Map<string, Course[]>();
+	public insightDataRooms: Map<string, Room[]> = new Map<string, Room[]>();
 	// updated after addDataset adds a dataset - contains ids strings of datasets
 	public addedDatasets: InsightDataset[] = [];
 	// array of added ids
@@ -44,18 +48,21 @@ export default class InsightFacade implements IInsightFacade {
 				return reject(new InsightError("ID already added"));
 			}
 
-			// check for right kind (only courses)
-			if (kind !== InsightDatasetKind.Courses) {
-				return reject(new InsightError("Unknown kind"));
-			}
-
 			// check if content string is invalid
 			if (content === null || content === "" || content === undefined) {
 				return reject(new InsightError("invalid content name"));
 			}
 
-			// get content from zip file and parse into dataset
-			return JSONHandler.getContent(id, content, this, resolve, reject);
+			if (kind === InsightDatasetKind.Courses) {
+				// get content from zip file and parse into dataset
+				return JSONHandler.getContent(id, content, this, resolve, reject);
+			} else if (kind === InsightDatasetKind.Rooms) {
+				return HTMLHandler.getContent(id, content, this, resolve, reject);
+			} else {
+				return reject(new InsightError("Unknown kind"));
+			}
+
+
 		});
 	}
 
@@ -82,10 +89,8 @@ export default class InsightFacade implements IInsightFacade {
 					this.addedDatasets.splice(index,1);
 				}
 			});
+			DiskHelper.deleteFromDisk(id);
 			resolve(id);
-
-			// TODO cache removal
-
 		});
 	}
 
