@@ -1,6 +1,6 @@
 import Course from "./Course";
 import * as fs from "fs";
-import {InsightError} from "./IInsightFacade";
+import {InsightError, NotFoundError} from "./IInsightFacade";
 import InsightFacade from "./InsightFacade";
 
 export default class DiskHelper {
@@ -20,6 +20,23 @@ export default class DiskHelper {
 					reject(new InsightError("write file error"));
 				} else {
 					resolve(data.idArray);
+				}
+			});
+		});
+	}
+
+	public static deleteFromDisk(id: string): any {
+		let dataDir = "./data/" + id + ".json";
+
+		return new Promise((resolve, reject) => {
+			if (!fs.existsSync(dataDir)) {
+				reject(new NotFoundError("no data to remove"));
+			}
+			fs.unlink(dataDir, (err) => {
+				if (err) {
+					reject(new InsightError("remove file error"));
+				} else {
+					resolve(id);
 				}
 			});
 		});

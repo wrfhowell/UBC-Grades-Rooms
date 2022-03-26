@@ -13,7 +13,9 @@ import JSONHandler from "./JSONHandler";
 import {Validation} from "./Validation";
 import {Execution} from "./Execution";
 import Course from "./Course";
-import Room from "./Rooms";
+import DiskHelper from "./DiskHelper";
+import Room from "./Room";
+import HTMLHandler from "./HTMLHandler";
 import {RoomExecution} from "./RoomExecution";
 
 
@@ -47,18 +49,21 @@ export default class InsightFacade implements IInsightFacade {
 				return reject(new InsightError("ID already added"));
 			}
 
-			// check for right kind (only courses)
-			if (kind !== InsightDatasetKind.Courses) {
-				return reject(new InsightError("Unknown kind"));
-			}
-
 			// check if content string is invalid
 			if (content === null || content === "" || content === undefined) {
 				return reject(new InsightError("invalid content name"));
 			}
 
-			// get content from zip file and parse into dataset
-			return JSONHandler.getContent(id, content, this, resolve, reject);
+			if (kind === InsightDatasetKind.Courses) {
+				// get content from zip file and parse into dataset
+				return JSONHandler.getContent(id, content, this, resolve, reject);
+			} else if (kind === InsightDatasetKind.Rooms) {
+				return HTMLHandler.getContent(id, content, this, resolve, reject);
+			} else {
+				return reject(new InsightError("Unknown kind"));
+			}
+
+
 		});
 	}
 
@@ -85,10 +90,8 @@ export default class InsightFacade implements IInsightFacade {
 					this.addedDatasets.splice(index,1);
 				}
 			});
+			DiskHelper.deleteFromDisk(id);
 			resolve(id);
-
-			// TODO cache removal
-
 		});
 	}
 
