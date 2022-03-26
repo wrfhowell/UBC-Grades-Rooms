@@ -1,0 +1,54 @@
+{
+	"title": "transform clause with all apply tokens",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"courses_avg": 98
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_title",
+				"overallAvg",
+				"overallSum",
+				"maxAVG",
+				"minAVG",
+				"countAVG"
+			]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"courses_title"
+			],
+			"APPLY": [
+				{
+					"overallAvg": {
+						"AVG": "courses_avg"
+					}
+				},
+				{
+					"overallSum": {
+						"SUM": "courses_avg"
+					}
+				},
+				{
+					"maxAVG": {
+						"MAX": "courses_avg"
+					}
+				},
+				{
+					"minAVG": {
+						"MIN": "courses_avg"
+					}
+				},
+				{
+					"countAVG": {
+						"COUNT": "courses_avg"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [{"courses_title":"career planning","overallAvg":99.19,"overallSum":99.19,"maxAVG":99.19,"minAVG":99.19,"countAVG":1},{"courses_title":"multimedia sys","overallAvg":98.75,"overallSum":197.5,"maxAVG":98.75,"minAVG":98.75,"countAVG":1},{"courses_title":"assess lrn diffi","overallAvg":98.38,"overallSum":295.14,"maxAVG":98.7,"minAVG":98.08,"countAVG":3},{"courses_title":"educ stds autism","overallAvg":98.7,"overallSum":493.48,"maxAVG":98.8,"minAVG":98.58,"countAVG":3},{"courses_title":"dev el sk df&hrd","overallAvg":98.45,"overallSum":196.9,"maxAVG":98.45,"minAVG":98.45,"countAVG":1},{"courses_title":"algb topology i","overallAvg":99.78,"overallSum":199.56,"maxAVG":99.78,"minAVG":99.78,"countAVG":1},{"courses_title":"cl pro prim care","overallAvg":98.46,"overallSum":393.84,"maxAVG":98.71,"minAVG":98.21,"countAVG":2},{"courses_title":"fam nrs pract","overallAvg":98.54,"overallSum":394.16,"maxAVG":98.58,"minAVG":98.5,"countAVG":2},{"courses_title":"work int health","overallAvg":98.98,"overallSum":197.96,"maxAVG":98.98,"minAVG":98.98,"countAVG":1}]
+}

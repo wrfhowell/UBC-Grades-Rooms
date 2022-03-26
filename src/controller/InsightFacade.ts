@@ -16,6 +16,7 @@ import Course from "./Course";
 import DiskHelper from "./DiskHelper";
 import Room from "./Room";
 import HTMLHandler from "./HTMLHandler";
+import {RoomExecution} from "./RoomExecution";
 
 
 /**
@@ -94,21 +95,28 @@ export default class InsightFacade implements IInsightFacade {
 		});
 	}
 
-	public performQuery(query: unknown): Promise<InsightResult[]> {
+	public performQuery(query: any): Promise<InsightResult[]> {
 		const y = new Execution();
+		const RoomExecutionObject = new RoomExecution();
+		if (!("WHERE" in query) || !("OPTIONS" in query) || !("COLUMNS" in query.OPTIONS)) {
+			return Promise.reject(new InsightError("No Options or Columns or Where"));
+		}
 		let datasetIdWithUnderscore = y.ReturnDatasetId(query);
 		let datasetId = datasetIdWithUnderscore.substring(0, datasetIdWithUnderscore.indexOf("_"));
 		const x = new Validation(datasetId);
 		this.curDatasetId = datasetId;
-		let dataset: Course[] = this.insightData.get(datasetId)!;
-		if (datasetIdWithUnderscore === false) {
-			return Promise.reject(new InsightError("No Options or Columns"));
-		}
-		if (dataset === undefined) {
+		let datasetCourse = this.insightData.get(datasetId)!;
+		let datasetRooms = this.insightDataRooms.get(datasetId)!;
+		if (datasetCourse === undefined && datasetRooms === undefined) {
 			return Promise.reject(new InsightError("dataset not added"));
 		}
 		if (x.Validate(query)) {
-			let result = y.ExecuteOnCourses(query, dataset);
+			let result: any = [];
+			if (datasetCourse !== undefined) {
+				result = y.ExecuteOnCourses(query, datasetCourse);
+			} else if (datasetRooms !== undefined) {
+				result = RoomExecutionObject.ExecuteOnRooms(query, datasetRooms);
+			}
 			if (result.length > 5000) {
 				return Promise.reject(new ResultTooLargeError("too many sections"));
 			}

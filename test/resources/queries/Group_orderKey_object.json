@@ -1,0 +1,56 @@
+{
+	"title": "transform clause with orderkey Object",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"courses_avg": 98
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_dept",
+				"overallAvg",
+				"overallSum",
+				"maxAVG",
+				"minAVG",
+				"countAVG"
+			],
+			"ORDER": {"dir" : "DOWN",
+				"keys" : ["courses_dept", "overallAvg"]}
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"courses_dept"
+			],
+			"APPLY": [
+				{
+					"overallAvg": {
+						"AVG": "courses_avg"
+					}
+				},
+				{
+					"overallSum": {
+						"SUM": "courses_avg"
+					}
+				},
+				{
+					"maxAVG": {
+						"MAX": "courses_avg"
+					}
+				},
+				{
+					"minAVG": {
+						"MIN": "courses_avg"
+					}
+				},
+				{
+					"countAVG": {
+						"COUNT": "courses_avg"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [{"courses_dept":"spph","overallAvg":98.98,"overallSum":197.96,"maxAVG":98.98,"minAVG":98.98,"countAVG":1},{"courses_dept":"nurs","overallAvg":98.5,"overallSum":788,"maxAVG":98.71,"minAVG":98.21,"countAVG":4},{"courses_dept":"math","overallAvg":99.78,"overallSum":199.56,"maxAVG":99.78,"minAVG":99.78,"countAVG":1},{"courses_dept":"epse","overallAvg":98.55,"overallSum":985.52,"maxAVG":98.8,"minAVG":98.08,"countAVG":7},{"courses_dept":"eece","overallAvg":98.75,"overallSum":197.5,"maxAVG":98.75,"minAVG":98.75,"countAVG":1},{"courses_dept":"cnps","overallAvg":99.19,"overallSum":99.19,"maxAVG":99.19,"minAVG":99.19,"countAVG":1}]
+}

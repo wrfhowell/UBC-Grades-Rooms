@@ -109,7 +109,7 @@ describe("Execution", function () {
 		expect(results).to.deep.equal([{avg: 69.2, dept: "cpsc", title: "engl112"}]);
 	});
 	it("Should return correct sections - test SComparison", function () {
-		let sections = x.ExecuteSComparison({IS: {dept: "cpsc"}}, courseArray[0]);
+		let sections = x.ExecuteSComparison({IS: {dept: "*t*"}}, courseArray[0]);
 		let results = x.ReturnResults(["uuid", "title", "avg", "dept"], sections);
 		expect(results).to.deep.equal([
 			{uuid: "001", title: "cpsc121", avg: 87.5, dept: "cpsc"},
@@ -117,8 +117,8 @@ describe("Execution", function () {
 			{uuid: "2351", title: "math200", avg: 50.3, dept: "cpsc"}
 		]
 		);
+		console.log(results);
 		let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "title", "avg"], ORDER: "title"}};
-		let results1 = x.Execute(query, courseArray[1]);
 	});
 	it("Should merge two Sections[]", function () {
 		let sections1 = [section1, section2];
@@ -171,7 +171,7 @@ describe("Execution", function () {
 				ORDER: "avg"
 			}
 		};
-		let result = x.ReturnOrderedSections(x.ReturnOrder(query),x.Execute(query, courseArray[0]));
+		let result = x.ReturnOrderedSections(x.ReturnOrder(query),x.ExecuteWhere(query.WHERE, courseArray[0]));
 		expect(result).deep.equal([
 			{dept: "cpsc", avg: 69.2},
 			{dept: "cpsc", avg: 87.5}
@@ -222,13 +222,19 @@ describe("Execution", function () {
 	});
 	it("Should return right order", function () {
 		let query = {WHERE: {}, OPTIONS: {COLUMNS: ["avg", "title"], ORDER: "avg"}};
-		let result = x.ReturnOrderedSections(x.ReturnOrder(query),x.Execute(query, courseArray[0]));
+		let result = x.ReturnOrderedSections(x.ReturnOrder(query),x.ExecuteWhere(query.WHERE, courseArray[0]));
 		console.log(result);
 		expect(result).to.deep.equal([
 			{avg: 50.3, title: "math200"},
 			{avg: 69.2, title: "engl112"},
 			{avg: 87.5, title: "cpsc121"}
 		]);
+	});
+	it("Should return right order - test multiple keys", function () {
+		let query = {WHERE: {}, OPTIONS: {COLUMNS: ["dept", "avg"], ORDER: "avg"}};
+		let result = x.ReturnOrderedSections(x.ReturnOrder(query),x.ExecuteOnCourses(query, courseArray));
+		let orderedResults = result.sort((a: any, b: any) => a.dept - b.dept);
+		console.log(orderedResults);
 	});
 	it("Should return right sections - complex query v2", function () {
 		let query = {
