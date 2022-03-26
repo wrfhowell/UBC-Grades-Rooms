@@ -29,12 +29,12 @@ export default class JSONHandler {
 						oneSection["Pass"],
 						oneSection["Fail"],
 						oneSection["Audit"],
-						oneSection["id"]);
+						oneSection["id"].toString());
 
-					if (oneSection["Section"] === "Overall") {
+					if (oneSection["Section"] === "overall") {
 						section.year = 1900;
 					} else {
-						section.year = oneSection["Year"];
+						section.year = Number(oneSection["Year"]);
 					}
 					course.addSection(section);
 				}

@@ -103,7 +103,20 @@ describe("Validation", function () {
 	describe("ValidateInputString", function() {
 
 		it("Should match Regex", function() {
-			ValidationObject.ValidateInputString("OMG YASS");
+			let result = ValidationObject.ValidateInputString("OMG**");
+			console.log(result);
+			let resultId = ValidationObject.ValidateIdString("___");
+			console.log(resultId);
+			let resultKey = ValidationObject.ValidateSKey("courses_name");
+			console.log(resultKey);
+			let wildCard = new RegExp(".*t.*");
+			console.log(wildCard.test("tgkhkhkkj"));
+			let omg = "*dsj*";
+			console.log(omg.replaceAll("*", ".*"));
+			let characterLiteral = new RegExp("^[^_]*_[^_]*$");
+			console.log(characterLiteral.test("_courses_dept"));
+			let characterLiteral2 = new RegExp("^[^_]+" + "_" + "(dept|href)" + "$");
+			console.log(characterLiteral2.test("courses_deptd"));
 		});
 	});
 
@@ -168,7 +181,7 @@ describe("Validation", function () {
 					expect(x).to.be.false;
 				});
 				it("Should NOT match regex for Skey - underscore at the start", function() {
-					let x = ValidationObject.ValidateIdString("_courses_dept");
+					let x = ValidationObject.ValidateSKey("_courses_dept");
 					expect(x).to.be.false;
 				});
 
@@ -252,6 +265,18 @@ describe("Validation", function () {
 				let x = "courses_avg";
 				let result = ValidationObject.ValidateOrder(x);
 				expect(result).to.be.true;
+			});
+		});
+		describe("Validate Groupkeys and ApplyKeys in Columns", function() {
+			it("Should return False - extra column", function() {
+				let array1 = ["c", "b","a"];
+				let array2 = ["b", "a", "c"];
+				const array2Sorted = array2.slice().sort();
+				let res = array1.length === array2.length && array1.slice().sort().every(function(val, index) {
+					return val === array2Sorted[index];
+				});
+				console.log(res);
+				console.log(array1.concat(array2));
 			});
 		});
 	});
