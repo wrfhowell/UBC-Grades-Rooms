@@ -2,7 +2,7 @@ import Section from "./Section";
 import Course from "./Course";
 import {Validation} from "./Validation";
 import {Transformations} from "./Transformations";
-import Room from "./Rooms";
+import Room from "./Room";
 
 let ValidationObject = new Validation("");
 let TransformationsObject = new Transformations();

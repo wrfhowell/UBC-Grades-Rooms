@@ -12,7 +12,9 @@ export default class Room {
 	private _href: string;
 
 
-	public constructor(fullname: string,
+
+	public constructor(
+		fullname: string,
 		shortname: string,
 		number: string,
 		name: string,

@@ -3,7 +3,7 @@ import chaiAsPromised from "chai-as-promised";
 import {describe} from "mocha";
 import {Execution} from "../../src/controller/Execution";
 import {Transformations} from "../../src/controller/Transformations";
-import Room from "../../src/controller/Rooms";
+import Room from "../../src/controller/Room";
 import {Validation} from "../../src/controller/Validation";
 import {RoomExecution} from "../../src/controller/RoomExecution";
 
