@@ -11,8 +11,6 @@ export default class Room {
 	private _furniture: string;
 	private _href: string;
 
-
-
 	public constructor(
 		fullname: string,
 		shortname: string,
