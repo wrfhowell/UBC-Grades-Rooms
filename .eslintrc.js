@@ -93,14 +93,8 @@ module.exports = {
 		"@typescript-eslint/type-annotation-spacing": "error",
 		"@typescript-eslint/unified-signatures": "error",
 		"array-bracket-spacing": "error",
-		"arrow-parens": [
-			"error",
-			"always"
-		],
-		"brace-style": [
-			"error",
-			"1tbs"
-		],
+		"arrow-parens": ["error", "always"],
+		"brace-style": ["error", "1tbs"],
 		"constructor-super": "error",
 		"curly": "error",
 		"eol-last": "error",
@@ -204,5 +198,8 @@ module.exports = {
 			2
 		],
 		"max-statements-per-line": "error"
-	}
+	},
+	"ignorePatterns": [
+		"frontend/**/*"
+	]
 };

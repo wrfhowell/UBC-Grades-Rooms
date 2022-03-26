@@ -11,7 +11,6 @@ export default class JSONHandler {
 	private static parse(id: string, data: InsightFacade, jsonString: string, courseName: string): any {
 		let json;
 
-
 		try {
 			json = JSON.parse(jsonString);
 		} catch (error) {
