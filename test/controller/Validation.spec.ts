@@ -267,6 +267,18 @@ describe("Validation", function () {
 				expect(result).to.be.true;
 			});
 		});
+		describe("Validate Groupkeys and ApplyKeys in Columns", function() {
+			it("Should return False - extra column", function() {
+				let array1 = ["c", "b","a"];
+				let array2 = ["b", "a", "c"];
+				const array2Sorted = array2.slice().sort();
+				let res = array1.length === array2.length && array1.slice().sort().every(function(val, index) {
+					return val === array2Sorted[index];
+				});
+				console.log(res);
+				console.log(array1.concat(array2));
+			});
+		});
 	});
 });
 

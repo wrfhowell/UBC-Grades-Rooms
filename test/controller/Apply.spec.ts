@@ -5,6 +5,7 @@ import Section from "../../src/controller/Section";
 import Course from "../../src/controller/Course";
 import {Execution} from "../../src/controller/Execution";
 import {Transformations} from "../../src/controller/Transformations";
+import {Validation} from "../../src/controller/Validation";
 
 chai.use(chaiAsPromised);
 
@@ -53,6 +54,7 @@ course2.addSection(section6);
 
 let courseArray = [course1, course2];
 let x = new Execution();
+let v = new Validation("courses");
 let y = new Transformations();
 dataset.set("courses", courseArray);
 
@@ -281,12 +283,8 @@ describe("Checkpoint 2 Expansion", function () {
 				{dept: "pastro", title: 100, avg: 90, room: 45},
 				{dept: "cooking", title: 100, avg: 93, room: 30}];
 			let sortKeys = ["dept", "title", "avg", "room"];
-			let result = data.sort((a: any, b: any) =>
-				a.dept.localeCompare(b.dept) || a.title - b.title || a.avg - b.avg || a.room - b.room
-			);
-
-			let result1 = data.sort((a: any, b: any) => {
-				let direction = 0, dir = "UP";
+			let result1 = data.sort(function(a: any, b: any) {
+				let direction: number = 1, dir = "UP";
 				if (dir === "UP") {
 					direction = 1;
 				} else {
@@ -299,10 +297,10 @@ describe("Checkpoint 2 Expansion", function () {
 						} else if (a[val] - b[val] > 0) {
 							return 1 * direction;
 						}
-					} else if (typeof a[val] === "string") {
-						if (a[val].localeCompare(b[val]) < 0) {
+					} else if (typeof b[val] === "string") {
+						if (a[val] < b[val]) {
 							return -1 * direction;
-						} else if (a[val].localeCompare(b[val]) > 0) {
+						} else if (a[val] > b[val]) {
 							return 1 * direction;
 						}
 					}
@@ -335,35 +333,36 @@ describe("Checkpoint 2 Expansion", function () {
 			});
 			it("Should return correct result on a simple Group query", function () {
 				let query = {
-					WHERE:
-							{
-								GT: {
-									courses_avg: 0
-								}
-							},
+
+					WHERE: {},
+
 					OPTIONS: {
-						COLUMNS: [
-							"courses_title",
-						]
-					}
-				};
-				let transform =
-				{
+
+						COLUMNS: ["courses_dept", "overallAvg"],
+						ORDER: {dir: "UP", keys: ["overallAvg"]}
+
+					},
+
 					TRANSFORMATIONS: {
-						GROUP: [
-							"courses_title"
-						],
-						APPLY: [
-							{
-								overallAvg: {
-									AVG: "courses_avg"
-								}
+
+						GROUP: ["courses_dept"],
+
+						APPLY: [{
+
+							overallAvg: {
+
+								AVG: "courses_avg"
+
 							}
-						]
+
+						}]
+
 					}
+
 				};
-				let result: any = x.ExecuteOnCourses(query, courseArray);
-				let resultAfterTransform = y.ExecuteTransformations(transform, result);
+				let validate = v.Validate(query);
+				console.log(validate);
+				let result = x.ExecuteOnCourses(query, courseArray);
 				console.log(result);
 			});
 		});

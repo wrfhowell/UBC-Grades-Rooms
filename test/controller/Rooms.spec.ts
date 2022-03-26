@@ -18,7 +18,7 @@ let room1 = new Room(
 roomArray.push(room1);
 
 let room2 = new Room(
-	"Geography","GEO ", "12","HEN_12", "56 Wesbrook ave",  23, 80,
+	"Geography","GEO", "12","HEN_12", "56 Wesbrook ave",  23, 80,
 	67, "Big room", "Small chairs and tables", "www.henningslink.com"
 );
 roomArray.push(room2);
@@ -48,33 +48,38 @@ roomDataset.set("rooms", roomArray);
 
 let x = new Execution();
 let y = new Transformations();
-let v = new Validation("");
+let v = new Validation("rooms");
 let r = new RoomExecution();
 
 describe("Rooms Expansion", function () {
 	describe("Simple EBNF", function () {
 		it("Should give correct Count", function () {
 			let query = {
-				WHERE: {
-					AND: [{
-						IS: {
-							furniture: "Movable chairs"
-						}
-					}, {
-						GT: {
-							seats: 0
-						}
-					}]
-				},
+
+				WHERE: {},
+
 				OPTIONS: {
-					COLUMNS: [
-						"shortname",
-						"seats",
-						"lat",
-						"lon"
-					],
-					ORDER: "shortname"
+
+					COLUMNS: ["courses_title", "overallAvg"]
+
+				},
+
+				TRANSFORMATIONS: {
+
+					GROUP: ["courses_title"],
+
+					APPLY: [{
+
+						overallAvg: {
+
+							AVG: "courses_avg"
+
+						}
+
+					}]
+
 				}
+
 			};
 			// let result = x.ExecuteOnCourses(query, roomArray);
 			let validate = v.Validate(query);
@@ -89,45 +94,52 @@ describe("Rooms Expansion", function () {
 				WHERE: {
 					AND: [{
 						GT: {
-							lat: 0
+							rooms_lat: 0
 						}
 					}, {
 						GT: {
-							seats: 0
+							rooms_seats: 0
 						}
 					}]
 				},
 				OPTIONS: {
 					COLUMNS: [
-						"shortname",
-						"furniture",
-						"maxSeats",
+						"rooms_furniture",
+						"shortNameCount",
 						"maxLat",
-						"maxLon"
+						"minLon"
 					],
-					ORDER: {
-						dir: "DOWN",
-						keys: ["maxSeats"]
-					}
+					ORDER: {dir: "DOWN", keys: ["rooms_furniture", "maxLat"]}
 				},
 				TRANSFORMATIONS: {
-					GROUP: ["shortname", "furniture"],
-					APPLY: [{
-						maxSeats: {
-							MAX: "seats"
-						}
-					}, {
-						maxLat: {
-							MAX: "lat"
-						}
-					}, {
-						maxLon: {
-							MAX: "lon"
-						}
-					}]
+					GROUP: ["rooms_furniture"],
+					APPLY: [{shortNameCount: {COUNT: "rooms_shortname"}},
+						{maxLat: {MAX: "rooms_lat"}},
+						{minLon: {MIN: "rooms_lon"}}]
 				}
 			};
-			let resultValidate = v.Validate(query);
+			let result = r.ExecuteOnRooms(query, roomArray);
+			console.log(result);
+		});
+		it ("Should return correct result with dataset id attached", function() {
+			let query = {
+				WHERE: {
+					GT: {
+						rooms_seats: 0
+					}
+				},
+				OPTIONS: {
+					COLUMNS: [
+						"rooms_name",
+						"rooms_seats",
+						"rooms_furniture"
+					],
+					ORDER: {dir: "UP", keys: ["rooms_furniture"]}
+				}
+			};
+			// let result = x.ExecuteOnCourses(query, roomArray);
+			let validate = v.Validate(query);
+			console.log(validate);
 			let result = r.ExecuteOnRooms(query, roomArray);
 			console.log(result);
 		});

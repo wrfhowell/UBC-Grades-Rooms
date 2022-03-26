@@ -41,7 +41,7 @@ export class Execution {
 		if (orderedResults.length === 0) {
 			return dataset;
 		} else {
-			return dataset;
+			return orderedResults;
 		}
 	}
 
@@ -53,8 +53,11 @@ export class Execution {
 			let keys = Object.keys(dataset[0]);
 			for (let j in keys) {
 				let curPropKey = keys[j];
-				let curValueToAppend = curSection[`${curPropKey}`];
+				let curValueToAppend = curSection[curPropKey];
 				let tempPropKey = prefix + curPropKey;
+				if (!ValidationObject.ValidateField(curPropKey)) {
+					tempPropKey = curPropKey;
+				}
 				tempObj[tempPropKey] = curValueToAppend;
 			}
 			resultArray.push(tempObj);
@@ -106,32 +109,35 @@ export class Execution {
 	}
 
 	public ReturnOrderedSectionsWithDir(orderKeys: any, dir: any, sections: any): any {
-		let sortedSections = sections;
+		let orderKeysNoID: any = [];
+		orderKeys.forEach((val: any) => {
+			orderKeysNoID.push(val.split("_").pop());
+		});
 		let direction = 0;
 		if (dir === "UP") {
 			direction = 1;
 		} else {
 			direction = -1;
 		}
-		let result = sortedSections.sort((a: any, b: any) => {
-			orderKeys.forEach((val: any) => {
-				if (typeof b[val] === "number") {
-					if (a[val] - b[val] < 0) {
+		let res = sections.sort((a: any, b: any) => {
+			for (let i of orderKeysNoID) {
+				if (typeof a[i] === "number") {
+					if (a[i] - b[i] < 0) {
 						return -1 * direction;
-					} else if (a[val] - b[val] > 0) {
+					} else if (a[i] - b[i] > 0) {
 						return 1 * direction;
 					}
-				} else if (typeof a[val] === "string") {
-					if (a[val].localeCompare(b[val]) < 0) {
+				} else if (typeof a[i] === "string") {
+					if (a[i] < (b[i])) {
 						return -1 * direction;
-					} else if (a[val].localeCompare(b[val]) > 0) {
+					} else if (a[i] > b[i]) {
 						return 1 * direction;
 					}
 				}
-			});
+			}
 			return 0;
 		});
-		return result;
+		return res;
 	}
 
 	public ExecuteWhere(WhereClause: any, dataset: any): any {
@@ -235,7 +241,6 @@ export class Execution {
 		let MComparator = Object.keys(MComparison)[0];
 		let MComparisonClause = MComparison[`${MComparator}`];
 		let mKey = Object.keys(MComparisonClause)[0];
-		type StringKeys = Extract<keyof Section, string>;
 		let mFieldString = mKey.split("_").pop();
 		let mField = mFieldString;
 		let ValueToCompare = MComparisonClause[`${mKey}`];

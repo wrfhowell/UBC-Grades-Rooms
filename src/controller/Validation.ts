@@ -15,16 +15,21 @@ export class Validation {
 	}
 
 	public Validate (query: any) {
-		let resultBeforeColumnCheck = false;
+		this.ColumnsOfCurrentQuery = query.OPTIONS.COLUMNS;
 		if (!("WHERE" in query)) {
 			return false;
 		}
 		if (("WHERE" in query) && ("OPTIONS" in query) && ("TRANSFORMATIONS" in query)) {
 			this.hasTransform = true;
-			this.ColumnsOfCurrentQuery = query.OPTIONS.COLUMNS;
-			return this.ValidateWhere(query.WHERE) &&
-				this.ValidateOptions(query.OPTIONS) &&
-				this.ValidateTransformations(query.TRANSFORMATIONS);
+			let syntaxRes = this.ValidateTransformations(query.TRANSFORMATIONS) &&
+					this.ValidateWhere(query.WHERE) &&
+				this.ValidateOptions(query.OPTIONS);
+			const groupAndApplyKeys = (this.groupKeys.concat(this.applyKeys)).slice().sort();
+			let SemanticRes = (this.ColumnsOfCurrentQuery.length === groupAndApplyKeys.length &&
+				this.ColumnsOfCurrentQuery.slice().sort().every(function(val: any, index: any) {
+					return val === groupAndApplyKeys[index];
+				}));
+			return syntaxRes && SemanticRes;
 		}
 		if (("WHERE" in query) && ("OPTIONS" in query)) {
 			return this.ValidateWhere(query.WHERE) && this.ValidateOptions(query.OPTIONS);
@@ -42,15 +47,15 @@ export class Validation {
 	}
 
 	public ValidateOptions(Options: any): boolean {
-		let resultOfValidateOrder = false;
+		let resultOfValidateOrder = true;
 		let resultOfValidateColumn = false;
 		let ColumnObject = Options.COLUMNS;
 		let OrderObject = Options.ORDER;
+		if (ColumnObject !== undefined && this.hasTransform === false) {
+			resultOfValidateColumn = this.ValidateColumns(ColumnObject);
+		}
 		if (OrderObject !== undefined) {
 			resultOfValidateOrder = this.ValidateOrder(OrderObject);
-		}
-		if (ColumnObject !== undefined && this.hasTransform === false) {
-			resultOfValidateColumn = this.ValidateColumns(ColumnObject) && ColumnObject.includes(OrderObject);
 		}
 		if (ColumnObject !== undefined && this.hasTransform === true) {
 			resultOfValidateColumn = true;
@@ -67,8 +72,8 @@ export class Validation {
 	}
 
 	public ValidateGroup(Group: any): boolean {
+		this.groupKeys.push(...Group);
 		Group.forEach((val: any) => {
-			this.groupKeys.push(val);
 			if (!this.ValidateKey(val) || !this.ColumnsOfCurrentQuery.includes(val)) {
 				return false;
 			}
@@ -77,33 +82,43 @@ export class Validation {
 	}
 
 	public ValidateApply(Apply: any): boolean {
+		let applyKeyCounter: any = [];
+		let res = true;
 		Apply.forEach((val: any) => {
 			let curApplyKey = Object.getOwnPropertyNames(val);
-			console.log("applykey: " + curApplyKey);
 			this.applyKeys.push(...curApplyKey);
 			let validTokens = ["MAX", "MIN", "AVG", "SUM", "COUNT"];
 			let applyToken = Object.keys(val[curApplyKey[0]])[0];
+			// console.log("columns: " + this.ColumnsOfCurrentQuery);
+			// console.log("curapplykey: " + curApplyKey);
+			// console.log(this.ColumnsOfCurrentQuery.includes(curApplyKey));
+			// console.log("cur mini res: " + !this.ColumnsOfCurrentQuery.includes(curApplyKey));
 			if (!this.ValidateKey(val[curApplyKey[0]][applyToken]) ||
 				curApplyKey.length !== 1 ||
-				!this.ColumnsOfCurrentQuery.includes(curApplyKey) ||
+				// !this.ColumnsOfCurrentQuery.includes(curApplyKey) ||
 				!validTokens.includes(applyToken) ||
-				applyToken.length !== 1)  {
-				return false;
+				applyKeyCounter.includes(curApplyKey))  {
+				res = false;
 			}
+			applyKeyCounter.push(curApplyKey);
 		});
-		return true;
+		return res;
 	}
 
 	public ValidateOrder(Orders: any): boolean {
+		let res = true;
 		if (typeof Orders === "string") {
-			return this.ValidateKey(Orders);
+			return this.ValidateKey(Orders) && this.ColumnsOfCurrentQuery.includes(Orders);
 		} else if ("dir" in Orders && "keys" in Orders && Object.keys(Orders).length === 2) {
 			Orders.keys.forEach((val: any) => {
-				if (!this.ValidateKey(val)) {
-					return false;
+				if (!this.ColumnsOfCurrentQuery.includes(val)) {
+					res = false;
 				}
 			});
-			return true;
+			if (Orders.dir !== "UP" && Orders.dir !== "DOWN") {
+				res = false;
+			}
+			return res;
 		}
 		return false;
 	}
@@ -135,20 +150,46 @@ export class Validation {
 		let SField = new RegExp("(dept|id|instructor|title|uuid|fullname|shortname|" +
 			"number|name|address|type|furniture|href)");
 		const sKey = new RegExp("^[^_]+" + "_" + SField.source + "$");
-		let datasetIdOfMKey = Skey.substring(0,Skey.indexOf("_"));
-		if (datasetIdOfMKey !== this.curDatasetId) {
+		let datasetIdOfSKey = Skey.substring(0,Skey.indexOf("_"));
+		if (datasetIdOfSKey !== this.curDatasetId) {
 			return false;
 		}
 		return sKey.test(Skey);
 	}
 
+	public ValidateRoomSKey(Skey: any): boolean {
+		let SField = new RegExp("(number|name|address|type|furniture|href)");
+		const sKey = new RegExp("^[^_]+" + "_" + SField.source + "$");
+		let datasetIdOfSKey = Skey.substring(0,Skey.indexOf("_"));
+		if (datasetIdOfSKey !== this.curDatasetId) {
+			return false;
+		}
+		return sKey.test(Skey);
+	}
+
+	public ValidateCourseSKey(Skey: any): boolean {
+		let SField = new RegExp("(dept|id|instructor|title|uuid|fullname|shortname)");
+		const sKey = new RegExp("^[^_]+" + "_" + SField.source + "$");
+		let datasetIdOfSKey = Skey.substring(0,Skey.indexOf("_"));
+		if (datasetIdOfSKey !== this.curDatasetId) {
+			return false;
+		}
+		return sKey.test(Skey);
+	}
+
+	public ValidateField(inputField: any): boolean {
+		let Field = new RegExp("^(avg|pass|fail|audit|year|lat|lon|seats|" +
+			"dept|id|instructor|title|uuid|fullname|shortname|number|name|address|type|furniture|href)$");
+		return Field.test(inputField);
+	}
+
 	public ValidateInputString(inputString: any): boolean {
-		const InputString = new RegExp("[^*]*");
+		const InputString = new RegExp("^[^*]*$");
 		return InputString.test(inputString);
 	}
 
 	public ValidateIdString(idString: any): boolean {
-		const IdStringRegEx = new RegExp("[^_]+");
+		const IdStringRegEx = new RegExp("^[^_]+$");
 		return IdStringRegEx.test(idString);
 	}
 
@@ -170,7 +211,7 @@ export class Validation {
 	}
 
 	public ValidateMComparitor(MComparitor: any): boolean{
-		let mComparator = new RegExp("GT|LT|EQ");
+		let mComparator = new RegExp("^(GT|LT|EQ)$");
 		return mComparator.test(MComparitor);
 	}
 

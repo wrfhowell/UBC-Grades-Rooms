@@ -38,7 +38,7 @@ export class RoomExecution {
 		if (orderedResults.length === 0) {
 			return dataset;
 		} else {
-			return dataset;
+			return orderedResults;
 		}
 	}
 
@@ -52,6 +52,9 @@ export class RoomExecution {
 				let curPropKey = keys[j];
 				let curValueToAppend = curSection[`${curPropKey}`];
 				let tempPropKey = prefix + curPropKey;
+				if (!ValidationObject.ValidateField(curPropKey)) {
+					tempPropKey = curPropKey;
+				}
 				tempObj[tempPropKey] = curValueToAppend;
 			}
 			resultArray.push(tempObj);
@@ -82,9 +85,9 @@ export class RoomExecution {
 	}
 
 	public ReturnOrderedSections(orderKey: any, sections: any) {
-		if (this.ReturnKeyType(orderKey) === "number") {
+		if (typeof sections[0][orderKey] === "number") {
 			return sections.sort((a: any, b: any) => a[orderKey] - b[orderKey]);
-		} else if (this.ReturnKeyType(orderKey) === "string") {
+		} else if (typeof sections[0][orderKey] === "string") {
 			return sections.sort((a: any, b: any) => a[orderKey].localeCompare(b[orderKey]));
 		}
 	}
@@ -102,20 +105,35 @@ export class RoomExecution {
 	}
 
 	public ReturnOrderedSectionsWithDir(orderKeys: any, dir: any, sections: any) {
-		let sortedSections = sections;
+		let orderKeysNoID: any = [];
+		orderKeys.forEach((val: any) => {
+			orderKeysNoID.push(val.split("_").pop());
+		});
+		let direction = 0;
 		if (dir === "UP") {
-			orderKeys.forEach((val: any) => {
-				sortedSections = sortedSections.sort((a: any, b: any) => a[val] - b[val]);
-			});
-			return sortedSections;
-		} else if (dir === "DOWN") {
-			orderKeys.forEach((val: any) => {
-				sortedSections = sortedSections.sort((a: any, b: any) => b[val] - a[val]);
-			});
-			return sortedSections;
+			direction = 1;
 		} else {
-			return false;
+			direction = -1;
 		}
+		let res = sections.sort((a: any, b: any) => {
+			for (let i of orderKeysNoID) {
+				if (typeof a[i] === "number") {
+					if (a[i] - b[i] < 0) {
+						return -1 * direction;
+					} else if (a[i] - b[i] > 0) {
+						return 1 * direction;
+					}
+				} else if (typeof a[i] === "string") {
+					if (a[i] < (b[i])) {
+						return -1 * direction;
+					} else if (a[i] > b[i]) {
+						return 1 * direction;
+					}
+				}
+			}
+			return 0;
+		});
+		return res;
 	}
 
 	public ExecuteWhere(WhereClause: any, dataset: Room[]): any {

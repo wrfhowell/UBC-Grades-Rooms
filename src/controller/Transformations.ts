@@ -1,3 +1,5 @@
+import Decimal from "decimal.js";
+
 export class Transformations {
 	private type = "yes";
 	public groupMap: Map<string, string[]>;
@@ -14,6 +16,10 @@ export class Transformations {
 	}
 
 	public ExecuteGroup(Group: any, Dataset: string[]): any {
+		let columnsWithoutID: any = [];
+		Group.forEach((val: any) => {
+			columnsWithoutID.push(val.split("_").pop());
+		});
 		function formKey(section: any, groupKeys: string[]) {
 			let key = "";
 			for (let i in groupKeys) {
@@ -24,7 +30,7 @@ export class Transformations {
 		let groupedMap: Map<string, string[]>;
 		groupedMap = new Map<string, string[]>();
 		for (let i of Dataset) {
-			let currKey = formKey(i, Group);
+			let currKey = formKey(i, columnsWithoutID);
 			let mapValRef = groupedMap.get(currKey);
 			if (!mapValRef) {
 				let blank = [];
@@ -82,7 +88,7 @@ export class Transformations {
 	}
 
 	public ApplyCount(Clause: any, groupMap: Map<string, any>, ApplyKey: any) {
-		let keyToCount = Clause.COUNT;
+		let keyToCount = Clause.COUNT.split("_").pop();
 		for (const [key, value] of groupMap.entries()) {
 			let currValue = value.reduce((a: any, b: any) => {
 				if (!a.includes(b[keyToCount])) {
@@ -98,7 +104,7 @@ export class Transformations {
 	}
 
 	public ApplyMax(Clause: any, groupMap: Map<string, any>, ApplyKey: any) {
-		let keyToMax = Clause.MAX;
+		let keyToMax = Clause.MAX.split("_").pop();
 		for (const [key, value] of groupMap.entries()) {
 			let currValue = value.reduce((a: any, b: any) => {
 				if (b[keyToMax] > a) {
@@ -114,7 +120,7 @@ export class Transformations {
 	}
 
 	public ApplyMin(Clause: any, groupMap: Map<string, any>, ApplyKey: any) {
-		let keyToMin = Clause.MIN;
+		let keyToMin =  Clause.MIN.split("_").pop();
 		for (const [key, value] of groupMap.entries()) {
 			let currValue = value.reduce((a: any, b: any) => {
 				if (b[keyToMin] < a) {
@@ -130,27 +136,30 @@ export class Transformations {
 	}
 
 	public ApplyAvg(Clause: any, groupMap: Map<string, any>, ApplyKey: any) {
-		let keyToAvg = Clause.AVG;
+		let keyToAvg = Clause.AVG.split("_").pop();
 		for (const [key, value] of groupMap.entries()) {
 			let currValue = value.reduce((a: any, b: any) => {
-				a = a + b[keyToAvg];
+				let decimalVal = new Decimal(b[keyToAvg]);
+				a = decimalVal.add(a);
 				return a;
 			}, 0);
-			currValue = currValue / value.length;
+			currValue = currValue.toNumber() / value.length;
+			let res = Number(currValue.toFixed(2));
 			for (let i in value) {
-				value[i][ApplyKey] = currValue;
+				value[i][ApplyKey] = res;
 			}
 		}
 		return groupMap;
 	}
 
 	public ApplySum(Clause: any, groupMap: Map<string, any>, ApplyKey: any) {
-		let keyToAvg = Clause.SUM;
+		let keyToAvg = Clause.SUM.split("_").pop();
 		for (const [key, value] of groupMap.entries()) {
 			let currValue = value.reduce((a: any, b: any) => {
 				a = a + b[keyToAvg];
 				return a;
 			}, 0);
+			currValue = Number(currValue.toFixed(2));
 			for (let i in value) {
 				value[i][ApplyKey] = currValue;
 			}
@@ -174,6 +183,10 @@ export class Transformations {
 			return el[`${PropKey}`] === Value;
 		});
 		return filteredArray.length;
+	}
+
+	public ReturnField(key: string): string {
+		return "";
 	}
 }
 

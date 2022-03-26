@@ -13,6 +13,8 @@ import JSONHandler from "./JSONHandler";
 import {Validation} from "./Validation";
 import {Execution} from "./Execution";
 import Course from "./Course";
+import Room from "./Rooms";
+import {RoomExecution} from "./RoomExecution";
 
 
 /**
@@ -23,6 +25,7 @@ import Course from "./Course";
 export default class InsightFacade implements IInsightFacade {
 	// key is string containing id, value is array of courses containing sections or rooms?
 	public insightData: Map<string, Course[]> = new Map<string, Course[]>();
+	public insightDataRooms: Map<string, Room[]> = new Map<string, Room[]>();
 	// updated after addDataset adds a dataset - contains ids strings of datasets
 	public addedDatasets: InsightDataset[] = [];
 	// array of added ids
@@ -91,6 +94,7 @@ export default class InsightFacade implements IInsightFacade {
 
 	public performQuery(query: any): Promise<InsightResult[]> {
 		const y = new Execution();
+		const RoomExecutionObject = new RoomExecution();
 		if (!("WHERE" in query) || !("OPTIONS" in query) || !("COLUMNS" in query.OPTIONS)) {
 			return Promise.reject(new InsightError("No Options or Columns or Where"));
 		}
@@ -98,12 +102,18 @@ export default class InsightFacade implements IInsightFacade {
 		let datasetId = datasetIdWithUnderscore.substring(0, datasetIdWithUnderscore.indexOf("_"));
 		const x = new Validation(datasetId);
 		this.curDatasetId = datasetId;
-		let dataset: Course[] = this.insightData.get(datasetId)!;
-		if (dataset === undefined) {
+		let datasetCourse = this.insightData.get(datasetId)!;
+		let datasetRooms = this.insightDataRooms.get(datasetId)!;
+		if (datasetCourse === undefined && datasetRooms === undefined) {
 			return Promise.reject(new InsightError("dataset not added"));
 		}
 		if (x.Validate(query)) {
-			let result = y.ExecuteOnCourses(query, dataset);
+			let result: any = [];
+			if (datasetCourse !== undefined) {
+				result = y.ExecuteOnCourses(query, datasetCourse);
+			} else if (datasetRooms !== undefined) {
+				result = RoomExecutionObject.ExecuteOnRooms(query, datasetRooms);
+			}
 			if (result.length > 5000) {
 				return Promise.reject(new ResultTooLargeError("too many sections"));
 			}
