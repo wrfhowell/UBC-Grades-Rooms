@@ -89,13 +89,8 @@ export class Validation {
 			this.applyKeys.push(...curApplyKey);
 			let validTokens = ["MAX", "MIN", "AVG", "SUM", "COUNT"];
 			let applyToken = Object.keys(val[curApplyKey[0]])[0];
-			// console.log("columns: " + this.ColumnsOfCurrentQuery);
-			// console.log("curapplykey: " + curApplyKey);
-			// console.log(this.ColumnsOfCurrentQuery.includes(curApplyKey));
-			// console.log("cur mini res: " + !this.ColumnsOfCurrentQuery.includes(curApplyKey));
 			if (!this.ValidateKey(val[curApplyKey[0]][applyToken]) ||
 				curApplyKey.length !== 1 ||
-				// !this.ColumnsOfCurrentQuery.includes(curApplyKey) ||
 				!validTokens.includes(applyToken) ||
 				applyKeyCounter.includes(curApplyKey))  {
 				res = false;

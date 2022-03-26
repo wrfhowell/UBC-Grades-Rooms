@@ -13,7 +13,7 @@ import JSONHandler from "./JSONHandler";
 import {Validation} from "./Validation";
 import {Execution} from "./Execution";
 import Course from "./Course";
-import Room from "./Rooms";
+import Room from "./Room";
 import {RoomExecution} from "./RoomExecution";
 
 
