@@ -32,7 +32,7 @@ type Error = "InsightError" | "ResultTooLargeError" | "NotFoundError";
 chai.use(chaiAsPromised);
 
 describe("InsightFacade", function () {
-	this.timeout(10000);
+	this.timeout(30000);
 	// Promise should fulfill an array of currently added InsightDatasets, and will only fulfill.
 
 	let courses: string;
@@ -44,8 +44,10 @@ describe("InsightFacade", function () {
 	let blankJson: string;
 	let coursesRemoveOneFile: string;
 	let oneInvalidJsonFile: string;
+	let rooms: string;
 
 	before(function () {
+		rooms = getContentFromArchives("rooms.zip");
 		courses = getContentFromArchives("courses.zip");
 		noCoursesDir = getContentFromArchives("NO_COURSES_DIR.zip");
 		emptyCoursesDir = getContentFromArchives("EMPTY_COURSES_DIR.zip");
@@ -143,6 +145,26 @@ describe("InsightFacade", function () {
 						id: "courses",
 						kind: InsightDatasetKind.Courses,
 						numRows: 64612
+					}]
+					);
+				});
+		});
+
+		it("Should add one Dataset - rooms", function () {
+			return facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms)
+				.then((addedIds) => {
+					expect(addedIds).to.be.instanceof(Array);
+					expect(addedIds).to.have.length(1);
+					expect(addedIds).to.deep.equal(["rooms"]);
+				})
+				.then(() => {
+					return facade.listDatasets();
+				})
+				.then((dataset) => {
+					expect(dataset).to.deep.equal([{
+						id: "rooms",
+						kind: InsightDatasetKind.Rooms,
+						numRows: 364
 					}]
 					);
 				});
