@@ -38,6 +38,11 @@ export default class InsightFacade implements IInsightFacade {
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		return new Promise<string[]>((resolve,reject) => {
+			// check if content string is invalid
+			if (content === null || content === "" || content === undefined) {
+				return reject(new InsightError("invalid content name"));
+			}
+
 			// check if id is valid according to spec
 			if (!AddDatasetHelper.validIdCheck(id)) {
 				return reject(new InsightError("Invalid ID Inputted"));
@@ -46,11 +51,6 @@ export default class InsightFacade implements IInsightFacade {
 			// check if id has already been added before
 			if (AddDatasetHelper.idAddedAlready(id, this)) {
 				return reject(new InsightError("ID already added"));
-			}
-
-			// check if content string is invalid
-			if (content === null || content === "" || content === undefined) {
-				return reject(new InsightError("invalid content name"));
 			}
 
 			if (kind === InsightDatasetKind.Courses) {
@@ -79,6 +79,7 @@ export default class InsightFacade implements IInsightFacade {
 			}
 
 			this.insightData.delete(id);
+			this.insightDataRooms.delete(id);
 			this.idArray.forEach((item, index) => {
 				if (item === id){
 					this.idArray.splice(index, 1);

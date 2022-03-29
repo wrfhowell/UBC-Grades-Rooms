@@ -1,7 +1,5 @@
 import InsightFacade from "./InsightFacade";
 import JSZip from "jszip";
-import Section from "./Section";
-import Course from "./Course";
 import {InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
 import DiskHelper from "./DiskHelper";
 import parse5 from "parse5";
@@ -10,11 +8,6 @@ import Building from "./Building";
 import Room from "./Room";
 
 export default class HTMLHandler {
-	// private  buildingsArray: any;
-	//
-	// constructor() {
-	// 	this.buildingsArray = [];
-	// }
 
 	public static getContent(
 		id: string,
@@ -22,78 +15,72 @@ export default class HTMLHandler {
 		data: InsightFacade,
 		resolve: (value: any) => any, reject: (value: any) => any): any {
 		let jszip: JSZip = new JSZip();
-		let zipData = new JSZip();
+		let zipData: any;
+		let buildingArray: any = [];
 		jszip.loadAsync(content, {base64: true})
 			.then((zip: any) => {
 				zipData = zip;
 				let promiseArrayBuildings: Array<Promise<any>> = [];
-				zip.file("rooms/index.htm").async("string").then((htmlString: string) => {
-					let htmlNode = parse5.parse(htmlString);
-					// find table with building info - place into tableNode
-					let tableNode = HTMLHandler.findTableRecurs(htmlNode);
-					promiseArrayBuildings = HTMLHandler.makeBuildingsIterative(tableNode);
-				});
-				return Promise.all(promiseArrayBuildings);
-			}).then((buildings: Building[]) => {
-				buildings.filter((oneBuilding) => {
-					return oneBuilding !== null;
-				});
-				let allRooms: any[] = [];
-				let numRows = 0;
-				for (let building of buildings) {
-					let buildingLink = building.link.substring(2);
-					let oneBuildingRooms;
-					if (buildingLink) {
-						oneBuildingRooms = this.getRooms(building, buildingLink, zipData);
-					}
-					if (oneBuildingRooms.isArray(Room)) {
-						numRows += oneBuildingRooms.length;
-						allRooms.concat(oneBuildingRooms);
-					}
-				}
-				if (allRooms.length > 0) {
-					data.insightDataRooms.set(id, allRooms);
-					data.addedDatasets.push({id: id, kind: InsightDatasetKind.Rooms, numRows: numRows} as
-						InsightDataset);
-					data.idArray.push(id);
-					return resolve(DiskHelper.saveToDisk(id, allRooms, data));
-				} else {
-					return reject(new InsightError("empty"));
-				}
-			}).then(() => {
-				return resolve(data.idArray);
-			})
-			.catch((e) => {
-				return reject(new InsightError("invalid zip"));
+				zip.file("rooms/index.htm").async("string")
+					.then((htmlString: string) => {
+						if (htmlString) {
+							let htmlNode = parse5.parse(htmlString);
+							// find table with building info - place into tableNode
+							let tableNode = HTMLHandler.findTableRecurs(htmlNode);
+							if (tableNode === null) {
+								reject(new InsightError("no buildings found in recursion"));
+							}
+							promiseArrayBuildings = HTMLHandler.makeBuildingsIterative(tableNode);
+						}
+						return Promise.all(promiseArrayBuildings);
+					}).then((buildingsArr: Building[]) => {
+						buildingArray = buildingsArr;
+						return HTMLHandler.getBuildingFiles(buildingsArr, zipData);
+					}).then((htmlArray: any) => {
+						let allRooms: any[] = [];
+						allRooms = HTMLHandler.parseRooms(htmlArray, buildingArray);
+						if (allRooms.length > 0) {
+							let numRows = allRooms.length;
+							data.insightDataRooms.set(id, allRooms);
+							data.addedDatasets.push({id: id, kind: InsightDatasetKind.Rooms, numRows: numRows} as
+								InsightDataset);
+							data.idArray.push(id);
+							return resolve(DiskHelper.saveToDisk(id, allRooms, data));
+						} else {
+							return reject(new InsightError("empty"));
+						}
+					}).then(() => {
+						return resolve(data.idArray);
+					}).catch(() => {
+						return reject(new InsightError("invalid zip"));
+					});
 			});
 	}
 
 	public static findTableRecurs(htmlNode: any): any {
-		if (!htmlNode) {
-			return null;
-		} else if (htmlNode.tagName === "tbody") {
+		if (htmlNode.tagName === "tbody") {
 			return htmlNode;
-		} else if (htmlNode.childNodes !== null){
+		} else if (htmlNode === null) {
+			return null;
+		} else if (htmlNode.childNodes !== undefined && htmlNode.childNodes !== null){
+			let tableNode: any = null;
 			for(let node of htmlNode.childNodes) {
 				let retNode = this.findTableRecurs(node);
-				if (retNode) {
-					return retNode;
+				if (retNode !== null) {
+					tableNode = retNode;
 				}
 			}
+			return tableNode;
+		} else {
 			return null;
 		}
-		return null;
 	}
 
 	private static makeBuildingsIterative(tableNode: any): any {
 		if (tableNode.tagName === "tbody") {
 			let promiseArrayBuildings: Array<Promise<any>> = [];
 			for(let trNode of tableNode.childNodes) {
-				if (trNode.tagName === "tr" &&
-					trNode.attrs[0].value === "odd" ||
-					trNode.attrs[0].value === "even" ||
-					trNode.attrs[0].value === "odd views-row-first" ||
-					trNode.attrs[0].value === "even views-row-last") {
+				if (trNode.tagName === "tr") {
 					let building = this.getBuildingData(trNode);
 					promiseArrayBuildings.push(building);
 				}
@@ -152,33 +139,12 @@ export default class HTMLHandler {
 		});
 	}
 
-	private static getRooms(building: Building, buildingLink: string, zipData: JSZip): any {
-		return new Promise((resolve, reject) => {
-			let arrayRooms = [];
-			zipData.file(buildingLink)!.async("string")
-				.then((htmlString) => {
-					let htmlNode = parse5.parse(htmlString);
-					let tableNode = HTMLHandler.findTableRecurs(htmlNode);
-					arrayRooms = HTMLHandler.makeRoomsIterative(tableNode, building);
-					if (arrayRooms.length > 0) {
-						resolve(arrayRooms);
-					} else {
-						reject(new InsightError("no rooms found"));
-					}
-				});
-		});
-	}
-
-	private static makeRoomsIterative(tableNode: any, building: Building) {
+	private static makeRoomsIterative(tableNode: any, building: any) {
 		let arrayRooms = [];
 		if (tableNode.tagName === "tbody") {
 			// trNode IS a ROOM data
 			for(let trNode of tableNode.childNodes) {
-				if (trNode.tagName === "tr" &&
-					trNode.attrs[0].value === "odd" ||
-					trNode.attrs[0].value === "even" ||
-					trNode.attrs[0].value === "odd views-row-first" ||
-					trNode.attrs[0].value === "even views-row-last") {
+				if (trNode.tagName === "tr") {
 					let room = HTMLHandler.getRoomData(trNode, building);
 					if (room) {
 						arrayRooms.push(room);
@@ -202,17 +168,17 @@ export default class HTMLHandler {
 		let furniture = null;
 		let href = null;
 		let room = null;
-		for (let tdNode of trNode.childNodes) {
-			if (tdNode.nodeName === "td") {
-				if (tdNode.attrs[0].value === "views-field views-field-field-room-number") {
-					number = tdNode.childNodes[1].childNodes[0].value.trim();
-					href = tdNode.childNodes[1].attrs[0].value.trim();
-				} else if (tdNode.attrs[0].value === "views-field views-field-field-room-capacity") {
-					seats = tdNode.childNodes[0].value.trim();
-				} else if (tdNode.attrs[0].value === "views-field views-field-field-room-furniture") {
-					furniture = tdNode.childNodes[0].value.trim();
-				} else if (tdNode.attrs[0].value === "views-field views-field-field-room-type") {
-					type = tdNode.childNodes[0].value.trim();
+		for (let td of trNode.childNodes) {
+			if (td.nodeName === "td") {
+				if (td.attrs[0].value === "views-field views-field-field-room-number") {
+					number = td.childNodes[1].childNodes[0].value.trim();
+					href = td.childNodes[1].attrs[0].value.trim();
+				} else if (td.attrs[0].value === "views-field views-field-field-room-capacity") {
+					seats = td.childNodes[0].value.trim();
+				} else if (td.attrs[0].value === "views-field views-field-field-room-furniture") {
+					furniture = td.childNodes[0].value.trim();
+				} else if (td.attrs[0].value === "views-field views-field-field-room-type") {
+					type = td.childNodes[0].value.trim();
 				}
 			}
 		}
@@ -221,10 +187,36 @@ export default class HTMLHandler {
 		}
 
 		if(fullname && shortname &&
-			number && name && address && lat && lon && seats && type && furniture && href) {
+			name && address && lat && lon) {
 			room = new Room(fullname, shortname, number, name, address, lat, lon, seats, type, furniture, href);
 		}
 		return room;
+	}
+
+	private static getBuildingFiles(buildingsArray: any[], zipData: any): any {
+		let allHTMLStrings: Array<Promise<any>> = [];
+		for (let building of buildingsArray) {
+			let buildingLink = "rooms/" + building.link.substring(2);
+			let zipString = zipData.file(buildingLink).async("string");
+			allHTMLStrings.push(zipString);
+		}
+		return Promise.all(allHTMLStrings);
+	}
+
+	private static parseRooms(htmlArray: any[], buildingArray: any[]): any[] {
+		let allRooms: any[] = [];
+		for (let i: number = 0; i < buildingArray.length; i++) {
+			let arrayRooms: any = [];
+			let htmlNode = parse5.parse(htmlArray[i]);
+			let tableNode = HTMLHandler.findTableRecurs(htmlNode);
+			if (tableNode !== null) {
+				arrayRooms = HTMLHandler.makeRoomsIterative(tableNode, buildingArray[i]);
+			}
+			for (let room of arrayRooms) {
+				allRooms.push(room);
+			}
+		}
+		return allRooms;
 	}
 }
 
