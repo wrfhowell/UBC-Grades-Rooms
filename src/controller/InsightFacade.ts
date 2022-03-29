@@ -108,6 +108,8 @@ export default class InsightFacade implements IInsightFacade {
 		this.curDatasetId = datasetId;
 		let datasetCourse = this.insightData.get(datasetId)!;
 		let datasetRooms = this.insightDataRooms.get(datasetId)!;
+		console.log(this.insightDataRooms);
+		console.log(this.insightData);
 		if (datasetCourse === undefined && datasetRooms === undefined) {
 			return Promise.reject(new InsightError("dataset not added"));
 		}

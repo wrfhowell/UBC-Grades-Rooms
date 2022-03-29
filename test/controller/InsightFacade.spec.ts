@@ -517,4 +517,39 @@ describe("InsightFacade", function () {
 				assertOnError: assertError,            // options
 			});
 	});
+	describe("Perform Query - Rooms", function () {
+		// Promise should fulfill with an array of results
+		// Promise should reject with an InsightError describing the error.
+
+		before(function () {
+			clearDisk();
+			facade = new InsightFacade();
+			facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms);
+		});
+
+		function assertResult(actual: any, expected: Awaited<Output>): void {
+			expect(actual).to.have.deep.members(expected);
+		}
+
+		function assertError(actual: any, expected: Error): void {
+			if (expected === "InsightError") {
+				expect(actual).to.be.an.instanceof(InsightError);
+			} else if (expected === "ResultTooLargeError") {
+				expect(actual).to.be.an.instanceof(ResultTooLargeError);
+			} else if (expected === "NotFoundError") {
+				expect(actual).to.be.an.instanceof(NotFoundError);
+			} else {
+				expect.fail("UNEXPECTED ERROR");
+			}
+		}
+
+		folderTest<Input, Output, Error>(
+			"dynamic tests for performQuery()",           // suiteName
+			(input: Input): Output => facade.performQuery(input),
+			"./test/resources/RoomQuery",
+			{
+				assertOnResult: assertResult,
+				assertOnError: assertError,            // options
+			});
+	});
 });
