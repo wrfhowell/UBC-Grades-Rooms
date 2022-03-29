@@ -13,6 +13,9 @@ export default class JSONHandler {
 
 		try {
 			json = JSON.parse(jsonString);
+			if (!json || typeof json !== "object") {
+				return null;
+			}
 		} catch (error) {
 			return null;
 		}
