@@ -3,7 +3,6 @@ import JSZip from "jszip";
 import Section from "./Section";
 import Course from "./Course";
 import {InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
-import {rejects} from "assert";
 import DiskHelper from "./DiskHelper";
 
 export default class JSONHandler {

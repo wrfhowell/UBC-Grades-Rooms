@@ -19,6 +19,6 @@ export default class AddDatasetHelper {
 	}
 
 	public static idAddedAlready(id: string, data: InsightFacade): boolean {
-		return data.insightData.has(id);
+		return data.insightData.has(id) || data.insightDataRooms.has(id);
 	}
 }
