@@ -12,7 +12,6 @@ import InsightFacade from "../../src/controller/InsightFacade";
 import {clearDisk, getContentFromArchives} from "../TestUtil";
 import {describe} from "mocha";
 import {folderTest} from "@ubccpsc310/folder-test";
-import GeolocHelper from "../../src/controller/GeolocHelper";
 
 const regexp = new RegExp("^[1-9]{0,2}$");
 
@@ -490,6 +489,7 @@ describe("InsightFacade", function () {
 			clearDisk();
 			facade = new InsightFacade();
 			facade.addDataset("courses", courses, InsightDatasetKind.Courses);
+			facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms);
 		});
 
 		function assertResult(actual: any, expected: Awaited<Output>): void {

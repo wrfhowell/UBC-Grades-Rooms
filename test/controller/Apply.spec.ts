@@ -54,7 +54,7 @@ course2.addSection(section6);
 
 let courseArray = [course1, course2];
 let x = new Execution();
-let v = new Validation("courses");
+let v = new Validation("courses", "courses");
 let y = new Transformations();
 dataset.set("courses", courseArray);
 

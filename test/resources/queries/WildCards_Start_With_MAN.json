@@ -1,0 +1,27 @@
+{
+	"title": "Wildcard select all titles that start with ma",
+	"input": {
+		"WHERE": {
+			"IS" : {"courses_title": "man*"}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_title",
+				"overallAvg"
+			]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"courses_title"
+			],
+			"APPLY": [
+				{
+					"overallAvg": {
+						"AVG": "courses_avg"
+					}
+				}
+			]
+		}
+	},
+	"expected": [{"courses_title":"mangmt info orgs","overallAvg":86.57},{"courses_title":"manga & anime","overallAvg":74.3},{"courses_title":"managing e-busi","overallAvg":83.18},{"courses_title":"managerl decisns","overallAvg":80.99},{"courses_title":"managerial acctg","overallAvg":72.83},{"courses_title":"managerial econ","overallAvg":72.06},{"courses_title":"manu pro process","overallAvg":79.46},{"courses_title":"manufacturing","overallAvg":67.89},{"courses_title":"manag accounting","overallAvg":83.27}]
+}

@@ -6,6 +6,9 @@ import {Transformations} from "../../src/controller/Transformations";
 import Room from "../../src/controller/Room";
 import {Validation} from "../../src/controller/Validation";
 import {RoomExecution} from "../../src/controller/RoomExecution";
+import InsightFacade from "../../src/controller/InsightFacade";
+import {InsightDatasetKind} from "../../src/controller/IInsightFacade";
+import {clearDisk, getContentFromArchives} from "../TestUtil";
 
 chai.use(chaiAsPromised);
 
@@ -46,9 +49,11 @@ roomArray.push(room5);
 let roomDataset: Map<string, Room[]> = new Map<string, Room[]>();
 roomDataset.set("rooms", roomArray);
 
+let courses = getContentFromArchives("courses.zip");
+
 let x = new Execution();
 let y = new Transformations();
-let v = new Validation("rooms");
+let v = new Validation("rooms", "rooms");
 let r = new RoomExecution();
 
 describe("Rooms Expansion", function () {
@@ -183,7 +188,25 @@ describe("Rooms Expansion", function () {
 			let query = false;
 		});
 		it("Should return correct Filter clause", function() {
-			let query = false;
+
+			let query = {
+				WHERE: {
+					GT: {
+						rooms_seats: 0
+					}
+				},
+				OPTIONS: {
+					COLUMNS: [
+						"rooms_name",
+						"rooms_seats",
+						"rooms_furniture"
+					],
+					ORDER: {dir: "UP", keys: ["rooms_furniture"]}
+				}
+			};
+			let rooms = getContentFromArchives("rooms.zip");
+			let facade = new InsightFacade();
+			facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms);
 		});
 	});
 });
