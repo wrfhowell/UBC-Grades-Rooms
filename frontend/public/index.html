@@ -1,13 +1,36 @@
 <!DOCTYPE html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
 <html>
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
 		<title>310 Frontend</title>
 		<link href="/style.css" rel="stylesheet" />
 	</head>
+	<label>Pick a building to see it's rooms.
+		<input list="buildings" name="buildingList" /></label>
+		<datalist id="buildings">
+			<option value="Buchanan">
+			<option value="Henry Angus">
+			<option value="Neville Scarfe">
+			<option value="Orcahrd Commons">
+			<option value="Geography">
+			<option value="Macmillan">
+		</datalist>
 	<body>
-		<button id="click-me-button" class="button" >Click Me!</button>
+	<table class="table table-striped">
+		<tr  class="bg-info">
+			<th>Room Name</th>
+			<th>Furniture</th>
+			<th>Address</th>
+		</tr>
 
-		<script type="text/javascript" src="/frontend.js"></script>
+		<tbody id="myTable">
+
+		</tbody>
+	</table>
 	</body>
 </html>
+<script src="frontend.js"></script>
