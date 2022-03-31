@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+	  integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+	<title>310 Frontend</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<link href="/style.css" rel="stylesheet" />
+</head>
+<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<a href="index.html">Find UBC Rooms</a>
+		</div>
+		<ul class="nav navbar-nav">
+			<li><a href="courses.html">Find Course Averages</a></li>
+		</ul>
+	</div>
+</nav>
+
+
+<body>
+	<div id="query">
+		<label for="dept">Department (eg. CPSC)</label><br>
+		<input type="text" id="dept" name="dept" value="CPSC"><br>
+		<label for="course_num">Course Number</label><br>
+		<input type="text" id="course_num" name="course_num" value="110"><br>
+		<label for="year">Year</label><br>
+		<input type="text" id="year" name="year" value="2014"><br><br>
+		<button id="submit">Submit</button><br><br>
+		<text id="avg" style="color: white"></text>
+	</div>
+
+</body>
+</html>
+<script type="module" src="coursesFrontend.js"></script>

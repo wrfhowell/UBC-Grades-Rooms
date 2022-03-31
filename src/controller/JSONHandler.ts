@@ -60,7 +60,7 @@ export default class JSONHandler {
 				let promiseArray: Array<Promise<any>> = [];
 				zip.folder("courses")?.forEach( async (relativePath: any, file: any) => {
 					if (file !== null) {
-						courseName = file.name;
+						courseName = file.name.replace("courses/","");
 						let course = JSONHandler.loadFile(file, id, data, courseName);
 						promiseArray.push(course);
 					}
