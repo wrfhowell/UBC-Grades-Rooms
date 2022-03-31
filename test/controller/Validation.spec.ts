@@ -18,7 +18,7 @@ import {Execution} from "../../src/controller/Execution";
 chai.use(chaiAsPromised);
 
 
-let ValidationObject = new Validation("courses");
+let ValidationObject = new Validation("courses", "courses");
 let ExecutionObject = new Execution();
 
 describe("Validation", function () {
@@ -107,7 +107,7 @@ describe("Validation", function () {
 			console.log(result);
 			let resultId = ValidationObject.ValidateIdString("___");
 			console.log(resultId);
-			let resultKey = ValidationObject.ValidateSKey("courses_name");
+			let resultKey = ValidationObject.ValidateCourseSKey("courses_name");
 			console.log(resultKey);
 			let wildCard = new RegExp(".*t.*");
 			console.log(wildCard.test("tgkhkhkkj"));
@@ -149,6 +149,14 @@ describe("Validation", function () {
 				expect(x).to.be.false;
 			});
 
+			it("Should return True - correct wildcards", function() {
+				let obj = {IS: {courses_dept: "*math*"}};
+				let SCompRegEx = new RegExp( "^" + "`*`?[^*]*`*`?$");
+				console.log(SCompRegEx.test("*omg*"));
+				let x = ValidationObject.ValidateSComparison(obj);
+				expect(x).to.be.true;
+			});
+
 			it("Should return False - Skey Value is not String", function() {
 				let obj = {IS: {courses__dept: 94}};
 				let x = ValidationObject.ValidateSComparison(obj);
@@ -157,31 +165,31 @@ describe("Validation", function () {
 
 			describe("Skey", function() {
 				it("Should match regex for Skey", function() {
-					let x = ValidationObject.ValidateSKey("courses_dept");
+					let x = ValidationObject.ValidateCourseSKey("courses_dept");
 					expect(x).to.be.true;
 				});
 
 				it("Should NOT match regex for Skey - no underscore", function() {
-					let x = ValidationObject.ValidateSKey("coursesdeptt");
+					let x = ValidationObject.ValidateCourseSKey("coursesdeptt");
 					expect(x).to.be.false;
 				});
 
 				it("Should NOT match regex for Skey - all asterisks", function() {
-					let x = ValidationObject.ValidateSKey("****");
+					let x = ValidationObject.ValidateCourseSKey("****");
 					expect(x).to.be.false;
 				});
 
 				it("Should NOT match regex for Skey - wrong s key", function() {
-					let x = ValidationObject.ValidateSKey("courses_what");
+					let x = ValidationObject.ValidateCourseSKey("courses_what");
 					expect(x).to.be.false;
 				});
 
 				it("Should NOT match regex for Skey - two underscores", function() {
-					let x = ValidationObject.ValidateSKey("courses__dept");
+					let x = ValidationObject.ValidateCourseSKey("courses__dept");
 					expect(x).to.be.false;
 				});
 				it("Should NOT match regex for Skey - underscore at the start", function() {
-					let x = ValidationObject.ValidateSKey("_courses_dept");
+					let x = ValidationObject.ValidateCourseSKey("_courses_dept");
 					expect(x).to.be.false;
 				});
 
@@ -204,23 +212,23 @@ describe("Validation", function () {
 
 			describe("Mkey", function() {
 				it("Should match regex for Mkey", function () {
-					let x = ValidationObject.ValidateMKey("courses_avg");
+					let x = ValidationObject.ValidateCourseMKey("courses_avg");
 					console.log(x);
 					expect(x).to.be.true;
 				});
 
 				it("Should not match regex for Mkey - no underscores", function () {
-					let x = ValidationObject.ValidateMKey("coursesavg");
+					let x = ValidationObject.ValidateCourseMKey("coursesavg");
 					expect(x).to.be.false;
 				});
 
 				it("Should not match regex for Mkey - two underscore", function () {
-					let x = ValidationObject.ValidateMKey("courses__avg");
+					let x = ValidationObject.ValidateCourseMKey("courses__avg");
 					expect(x).to.be.false;
 				});
 
 				it("Should not match regex for Mkey - wrong Mfield", function () {
-					let x = ValidationObject.ValidateMKey("courses_WRONGavg");
+					let x = ValidationObject.ValidateCourseMKey("courses_WRONGavg");
 					expect(x).to.be.false;
 				});
 			});

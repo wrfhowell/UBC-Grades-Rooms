@@ -3,7 +3,7 @@ import Course from "./Course";
 import {Validation} from "./Validation";
 import {Transformations} from "./Transformations";
 
-let ValidationObject = new Validation("");
+let ValidationObject = new Validation("", "rooms");
 let TransformationsObject = new Transformations();
 
 export class Execution {
@@ -227,7 +227,7 @@ export class Execution {
 		let sCompClause = SComparison.IS;
 		let sKey = Object.keys(sCompClause)[0];
 		let sField = sKey.split("_").pop();
-		let valueToCompare = new RegExp((sCompClause[`${sKey}`]).replaceAll("*", ".*"));
+		let valueToCompare = new RegExp("^" + (sCompClause[`${sKey}`]).replaceAll("*", ".*") + "$");
 		let queriedISCase = dataset.sections.reduce((previousValue: Section[], currentValue: any) => {
 			if (valueToCompare.test(currentValue[`${sField}`])) {
 				previousValue.push(currentValue);

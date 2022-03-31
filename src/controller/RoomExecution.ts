@@ -4,7 +4,7 @@ import {Validation} from "./Validation";
 import {Transformations} from "./Transformations";
 import Room from "./Room";
 
-let ValidationObject = new Validation("");
+let ValidationObject = new Validation("", "rooms");
 let TransformationsObject = new Transformations();
 
 export class RoomExecution {

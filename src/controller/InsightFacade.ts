@@ -103,16 +103,19 @@ export default class InsightFacade implements IInsightFacade {
 			return Promise.reject(new InsightError("No Options or Columns or Where"));
 		}
 		let datasetIdWithUnderscore = y.ReturnDatasetId(query);
+		if ("TRANSFORMATIONS" in query) {
+			datasetIdWithUnderscore = query.TRANSFORMATIONS.GROUP[0];
+			datasetIdWithUnderscore = datasetIdWithUnderscore.substring(0, datasetIdWithUnderscore.indexOf("_") + 1);
+		}
+		console.log(datasetIdWithUnderscore);
 		let datasetId = datasetIdWithUnderscore.substring(0, datasetIdWithUnderscore.indexOf("_"));
-		const x = new Validation(datasetId);
 		this.curDatasetId = datasetId;
 		let datasetCourse = this.insightData.get(datasetId)!;
 		let datasetRooms = this.insightDataRooms.get(datasetId)!;
-		console.log(this.insightDataRooms);
-		console.log(this.insightData);
 		if (datasetCourse === undefined && datasetRooms === undefined) {
 			return Promise.reject(new InsightError("dataset not added"));
 		}
+		const x = new Validation(datasetId, this.addedDatasets.filter((ele: any) => ele.id === datasetId)[0].kind);
 		if (x.Validate(query)) {
 			let result: any = [];
 			if (datasetCourse !== undefined) {

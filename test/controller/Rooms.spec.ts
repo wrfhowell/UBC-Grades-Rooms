@@ -8,7 +8,7 @@ import {Validation} from "../../src/controller/Validation";
 import {RoomExecution} from "../../src/controller/RoomExecution";
 import InsightFacade from "../../src/controller/InsightFacade";
 import {InsightDatasetKind} from "../../src/controller/IInsightFacade";
-import {getContentFromArchives} from "../TestUtil";
+import {clearDisk, getContentFromArchives} from "../TestUtil";
 
 chai.use(chaiAsPromised);
 
@@ -53,7 +53,7 @@ let courses = getContentFromArchives("courses.zip");
 
 let x = new Execution();
 let y = new Transformations();
-let v = new Validation("rooms");
+let v = new Validation("rooms", "rooms");
 let r = new RoomExecution();
 
 describe("Rooms Expansion", function () {
@@ -188,9 +188,7 @@ describe("Rooms Expansion", function () {
 			let query = false;
 		});
 		it("Should return correct Filter clause", function() {
-			let rooms = getContentFromArchives("rooms.zip");
-			let facade = new InsightFacade();
-			facade.addDataset("courses", courses, InsightDatasetKind.Rooms);
+
 			let query = {
 				WHERE: {
 					GT: {
@@ -206,7 +204,9 @@ describe("Rooms Expansion", function () {
 					ORDER: {dir: "UP", keys: ["rooms_furniture"]}
 				}
 			};
-			console.log(facade.performQuery(query));
+			let rooms = getContentFromArchives("rooms.zip");
+			let facade = new InsightFacade();
+			facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms);
 		});
 	});
 });

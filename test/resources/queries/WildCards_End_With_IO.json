@@ -1,0 +1,27 @@
+{
+	"title": "Wildcard select all titles that end with io",
+	"input": {
+		"WHERE": {
+			"IS" : {"courses_title": "*io"}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_title",
+				"overallAvg"
+			]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"courses_title"
+			],
+			"APPLY": [
+				{
+					"overallAvg": {
+						"AVG": "courses_avg"
+					}
+				}
+			]
+		}
+	},
+	"expected": [{"courses_title":"res apl anml bio","overallAvg":84.26},{"courses_title":"anml hlth&physio","overallAvg":84.53},{"courses_title":"pediatric audio","overallAvg":89.03},{"courses_title":"prob-bsd lrn bio","overallAvg":90.39},{"courses_title":"intr modern bio","overallAvg":70.24},{"courses_title":"cell & orgsml bio","overallAvg":68.59},{"courses_title":"fund cell bio","overallAvg":67.7},{"courses_title":"evolutionary bio","overallAvg":73.62},{"courses_title":"intro to physio","overallAvg":76.76},{"courses_title":"cellular physio","overallAvg":74.76},{"courses_title":"phylogenetic bio","overallAvg":80.67},{"courses_title":"tech cel&dev bio","overallAvg":89.17},{"courses_title":"oral cell bio","overallAvg":88.14},{"courses_title":"eece dsgn studio","overallAvg":86.08},{"courses_title":"biom dsgn studio","overallAvg":89.68},{"courses_title":"elec eng studio","overallAvg":83.16},{"courses_title":"test constructio","overallAvg":90.33},{"courses_title":"stdy genre/perio","overallAvg":72.93},{"courses_title":"exprmtl molecbio","overallAvg":86.79},{"courses_title":"stat meth hd bio","overallAvg":88.86},{"courses_title":"dig media studio","overallAvg":71.33},{"courses_title":"fdn&media studio","overallAvg":72.5},{"courses_title":"mean&mtrl studio","overallAvg":74.65}]
+}

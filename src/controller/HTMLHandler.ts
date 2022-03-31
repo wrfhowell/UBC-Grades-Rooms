@@ -50,6 +50,7 @@ export default class HTMLHandler {
 							return reject(new InsightError("empty"));
 						}
 					}).then(() => {
+						// console.log(data.insightDataRooms);
 						return resolve(data.idArray);
 					}).catch(() => {
 						return reject(new InsightError("invalid zip"));

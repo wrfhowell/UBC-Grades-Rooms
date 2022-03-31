@@ -12,7 +12,6 @@ import InsightFacade from "../../src/controller/InsightFacade";
 import {clearDisk, getContentFromArchives} from "../TestUtil";
 import {describe} from "mocha";
 import {folderTest} from "@ubccpsc310/folder-test";
-import GeolocHelper from "../../src/controller/GeolocHelper";
 
 const regexp = new RegExp("^[1-9]{0,2}$");
 
@@ -490,40 +489,6 @@ describe("InsightFacade", function () {
 			clearDisk();
 			facade = new InsightFacade();
 			facade.addDataset("courses", courses, InsightDatasetKind.Courses);
-		});
-
-		function assertResult(actual: any, expected: Awaited<Output>): void {
-			expect(actual).to.have.deep.members(expected);
-		}
-
-		function assertError(actual: any, expected: Error): void {
-			if (expected === "InsightError") {
-				expect(actual).to.be.an.instanceof(InsightError);
-			} else if (expected === "ResultTooLargeError") {
-				expect(actual).to.be.an.instanceof(ResultTooLargeError);
-			} else if (expected === "NotFoundError") {
-				expect(actual).to.be.an.instanceof(NotFoundError);
-			} else {
-				expect.fail("UNEXPECTED ERROR");
-			}
-		}
-
-		folderTest<Input, Output, Error>(
-			"dynamic tests for performQuery()",           // suiteName
-			(input: Input): Output => facade.performQuery(input),
-			"./test/resources/queries",
-			{
-				assertOnResult: assertResult,
-				assertOnError: assertError,            // options
-			});
-	});
-	describe("Perform Query - Rooms", function () {
-		// Promise should fulfill with an array of results
-		// Promise should reject with an InsightError describing the error.
-
-		before(function () {
-			clearDisk();
-			facade = new InsightFacade();
 			facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms);
 		});
 
@@ -546,7 +511,7 @@ describe("InsightFacade", function () {
 		folderTest<Input, Output, Error>(
 			"dynamic tests for performQuery()",           // suiteName
 			(input: Input): Output => facade.performQuery(input),
-			"./test/resources/RoomQuery",
+			"./test/resources/queries",
 			{
 				assertOnResult: assertResult,
 				assertOnError: assertError,            // options

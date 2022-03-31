@@ -1,21 +1,21 @@
-import {InsightError, ResultTooLargeError} from "./IInsightFacade";
 import chai, {expect} from "chai";
 import chaiAsPromised from "chai-as-promised";
-
 chai.use(chaiAsPromised);
-
 export class Validation {
 	private curDatasetId = "";
+	private curDatasetKind = "";
 	private ColumnsOfCurrentQuery: any = [];
 	private groupKeys: any = [];
 	private applyKeys: any = [];
 	private hasTransform = false;
-	constructor (datasetId: string) {
+	constructor (datasetId: string, datasetKind: string) {
 		this.curDatasetId = datasetId;
+		this.curDatasetKind = datasetKind;
 	}
 
 	public Validate (query: any) {
 		this.ColumnsOfCurrentQuery = query.OPTIONS.COLUMNS;
+		console.log("hola from validate");
 		if (!("WHERE" in query)) {
 			return false;
 		}
@@ -25,10 +25,12 @@ export class Validation {
 					this.ValidateWhere(query.WHERE) &&
 				this.ValidateOptions(query.OPTIONS);
 			const groupAndApplyKeys = (this.groupKeys.concat(this.applyKeys)).slice().sort();
-			let SemanticRes = (this.ColumnsOfCurrentQuery.length === groupAndApplyKeys.length &&
-				this.ColumnsOfCurrentQuery.slice().sort().every(function(val: any, index: any) {
-					return val === groupAndApplyKeys[index];
-				}));
+			// let uniqueGroupAndApplyKeys = [...new Set(groupAndApplyKeys)];
+			// let SemanticRes = (this.ColumnsOfCurrentQuery.length === uniqueGroupAndApplyKeys.length &&
+			// 	this.ColumnsOfCurrentQuery.slice().sort().every(function(val: any, index: any) {
+			// 		return val === uniqueGroupAndApplyKeys[index];
+			// 	}));
+			let SemanticRes = this.ColumnsOfCurrentQuery.every((v: any) => groupAndApplyKeys.includes(v));
 			return syntaxRes && SemanticRes;
 		}
 		if (("WHERE" in query) && ("OPTIONS" in query)) {
@@ -89,10 +91,12 @@ export class Validation {
 			this.applyKeys.push(...curApplyKey);
 			let validTokens = ["MAX", "MIN", "AVG", "SUM", "COUNT"];
 			let applyToken = Object.keys(val[curApplyKey[0]])[0];
-			if (!this.ValidateKey(val[curApplyKey[0]][applyToken]) ||
+			let curApplyField = val[curApplyKey[0]][applyToken];
+			if (!this.ValidateKey(curApplyField) ||
 				curApplyKey.length !== 1 ||
 				!validTokens.includes(applyToken) ||
-				applyKeyCounter.includes(curApplyKey))  {
+				applyKeyCounter.includes(curApplyKey) ||
+				(["MAX", "MIN", "AVG", "SUM"].includes(applyToken) && !this.ValidateNumberKey(curApplyField))) {
 				res = false;
 			}
 			applyKeyCounter.push(curApplyKey);
@@ -119,6 +123,9 @@ export class Validation {
 	}
 
 	public ValidateColumns(Columns: any): boolean {
+		if (Columns.length === 0) {
+			return false;
+		}
 		for (let key of Columns) {
 			if (this.ValidateKey(key) === false) {
 				return false;
@@ -128,33 +135,16 @@ export class Validation {
 	}
 
 	public ValidateKey(key: any): boolean {
-		return this.ValidateMKey(key) || this.ValidateSKey(key);
-	}
-
-	public ValidateMKey(Mkey: any): boolean {
-		let MField = new RegExp("(avg|pass|fail|audit|year|lat|lon|seats)");
-		const mKey = new RegExp("^[^_]+" + "_" + MField.source + "$");
-		let datasetIdOfMKey = Mkey.substring(0,Mkey.indexOf("_"));
-		if (datasetIdOfMKey !== this.curDatasetId) {
-			return false;
+		if (this.curDatasetKind === "rooms") {
+			return this.ValidateRoomMKey(key) || this.ValidateRoomSKey(key);
+		} else if (this.curDatasetKind === "courses") {
+			return this.ValidateCourseMKey(key) || this.ValidateCourseSKey(key);
 		}
-		return mKey.test(Mkey);
-	}
-
-	public ValidateSKey(Skey: any): boolean {
-		let SField = new RegExp("(dept|id|instructor|title|uuid|fullname|shortname|" +
-			"number|name|address|type|furniture|href)");
-		const sKey = new RegExp("^[^_]+" + "_" + SField.source + "$");
-		let datasetIdOfSKey = Skey.substring(0,Skey.indexOf("_"));
-		if (datasetIdOfSKey !== this.curDatasetId) {
-			return false;
-		}
-		return sKey.test(Skey);
+		return false;
 	}
 
 	public ValidateRoomSKey(Skey: any): boolean {
-		let SField = new RegExp("(number|name|address|type|furniture|href)");
-		const sKey = new RegExp("^[^_]+" + "_" + SField.source + "$");
+		let sKey = new RegExp("^[^_]+_(number|name|address|type|furniture|href|fullname|shortname)$");
 		let datasetIdOfSKey = Skey.substring(0,Skey.indexOf("_"));
 		if (datasetIdOfSKey !== this.curDatasetId) {
 			return false;
@@ -163,8 +153,25 @@ export class Validation {
 	}
 
 	public ValidateCourseSKey(Skey: any): boolean {
-		let SField = new RegExp("(dept|id|instructor|title|uuid|fullname|shortname)");
-		const sKey = new RegExp("^[^_]+" + "_" + SField.source + "$");
+		let sKey = new RegExp("^[^_]+_(dept|id|instructor|title|uuid)$");
+		let datasetIdOfSKey = Skey.substring(0,Skey.indexOf("_"));
+		if (datasetIdOfSKey !== this.curDatasetId) {
+			return false;
+		}
+		return sKey.test(Skey);
+	}
+
+	public ValidateRoomMKey(Skey: any): boolean {
+		let sKey = new RegExp("^[^_]+_(lat|lon|seats)$");
+		let datasetIdOfSKey = Skey.substring(0,Skey.indexOf("_"));
+		if (datasetIdOfSKey !== this.curDatasetId) {
+			return false;
+		}
+		return sKey.test(Skey);
+	}
+
+	public ValidateCourseMKey(Skey: any): boolean {
+		let sKey = new RegExp("^[^_]+_(avg|pass|fail|audit|year)$");
 		let datasetIdOfSKey = Skey.substring(0,Skey.indexOf("_"));
 		if (datasetIdOfSKey !== this.curDatasetId) {
 			return false;
@@ -176,6 +183,10 @@ export class Validation {
 		let Field = new RegExp("^(avg|pass|fail|audit|year|lat|lon|seats|" +
 			"dept|id|instructor|title|uuid|fullname|shortname|number|name|address|type|furniture|href)$");
 		return Field.test(inputField);
+	}
+
+	public ValidateNumberKey(numberField: any): boolean {
+		return this.ValidateRoomMKey(numberField) || this.ValidateCourseMKey(numberField);
 	}
 
 	public ValidateInputString(inputString: any): boolean {
@@ -253,7 +264,8 @@ export class Validation {
 		if (this.ValidateMComparitor(mComparatorKey)) {
 			let mKeyClause = MComparison[`${mComparatorKey}`];
 			let mKey = Object.keys(mKeyClause)[0];
-			if (this.ValidateMKey(mKey)) {
+			if ((this.ValidateRoomMKey(mKey) && this.curDatasetKind === "rooms") ||
+				(this.ValidateCourseMKey(mKey) && this.curDatasetKind === "courses")) {
 				return typeof (mKeyClause[`${mKey}`]) === "number";
 			}
 		}
@@ -265,7 +277,8 @@ export class Validation {
 		let sCompKey = Object.keys(SComparison)[0];
 		let sKeyClause = SComparison[`${sCompKey}`];
 		let skey = Object.keys(SComparison.IS)[0];
-		if (sCompKey === "IS" && this.ValidateSKey(skey)) {
+		if ((sCompKey === "IS" && this.curDatasetKind === "rooms" && this.ValidateRoomSKey(skey)) ||
+			(sCompKey === "IS" && this.curDatasetKind === "courses" && this.ValidateCourseSKey(skey))) {
 			let sKeyClauseValue = sKeyClause[`${skey}`];
 			return SCompRegEx.test(sKeyClauseValue) && typeof sKeyClauseValue === "string";
 		}
