@@ -372,6 +372,24 @@ describe("InsightFacade", function () {
 				});
 		});
 
+		it("Should remove one Dataset- rooms", function () {
+			return facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms)
+				.then(() => {
+					return facade.removeDataset("rooms");
+				})
+				.then((removed) => {
+					// expect(removed).to.be.instanceof(String);
+					expect(removed).to.equal("rooms");
+				})
+				.then(() => {
+					return facade.listDatasets();
+				})
+				.then((dataset) => {
+					expect(dataset).to.be.instanceof(Array);
+					expect(dataset).to.have.length(0);
+				});
+		});
+
 		it("Should remove only one Dataset", function () {
 			return facade.addDataset("courses", courses, InsightDatasetKind.Courses)
 				.then(() => {
