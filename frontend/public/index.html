@@ -1,24 +1,79 @@
 <!DOCTYPE html>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+	  integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet'>
+<link href="/style.css" rel="stylesheet" />
 <html>
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
 		<title>310 Frontend</title>
-		<link href="/style.css" rel="stylesheet" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 	</head>
-	<label>Pick a building to see it's rooms.
-		<input list="buildings" name="buildingList" /></label>
-		<datalist id="buildings">
-			<option value="Buchanan">
-			<option value="Henry Angus">
-			<option value="Neville Scarfe">
-			<option value="Orcahrd Commons">
-			<option value="Geography">
-			<option value="Macmillan">
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a href="index.html">Find UBC Rooms</a>
+			</div>
+			<ul class="nav navbar-nav">
+				<li><a href="courses.html" style="color: white">Find Course Averages</a></li>
+			</ul>
+		</div>
+	</nav>
+	<div id="query">
+		<label>Pick a building to see it's rooms.
+			<input list="buildingsDatalist" id="buildings" name="buildingList" /></label>
+		<datalist id="buildingsDatalist">
+			<option value="Allard Hall (LAW)"></option>
+			<option value="Anthropology and Sociology"></option>
+			<option value="Aquatic Ecosystems Research Laboratory"></option>
+			<option value="Auditorium Annex"></option>
+			<option value="Biological Sciences"></option>
+			<option value="Brock Hall Annex"></option>
+			<option value="Buchanan"></option>
+			<option value="Centre for Interactive Research on Sustainability"></option>
+			<option value="Chemical and Biological Engineering Building"></option>
+			<option value="Chemistry"></option>
+			<option value="Civil and Mechanical Engineering"></option>
+			<option value="Earth Sciences Building"></option>
+			<option value="Earth and Ocean Sciences - Main"></option>
+			<option value="Food, Nutrition and Health"></option>
+			<option value="Forest Sciences Centre"></option>
+			<option value="Frank Forward"></option>
+			<option value="Frederic Lasserre"></option>
+			<option value="Friedman Building"></option>
+			<option value="Geography"></option>
+			<option value="Hebb"></option>
+			<option value="Hennings"></option>
+			<option value="Henry Angus"><option value="Hugh Dempster Pavilion"></option>
+			<option value="Iona Building"></option>
+			<option value="Irving K Barber Learning Centre"></option>
+			<option value="Jack Bell Building for the School of Social Work"></option>
+			<option value="Leonard S. Klinck (also known as CSCI)"></option>
+			<option value="Life Sciences Centre"></option>
+			<option value="MacLeod"></option><option value="MacMillan"></option>
+			<option value="Mathematics"></option>
+			<option value="Mathematics Annex"></option>
+			<option value="Neville Scarfe"></option>
+			<option value="Orchard Commons"></option>
+			<option value="Pharmaceutical Sciences Building"></option>
+			<option value="Ponderosa Commons: Oak House"></option>
+			<option value="Robert F. Osborne Centre"></option>
+			<option value="School of Population and Public Health"></option>
+			<option value="Student Recreation Centre"></option>
+			<option value="The Leon and Thea Koerner University Centre"></option>
+			<option value="War Memorial Gymnasium"></option>
+			<option value="Wesbrook"></option>
+			<option value="West Mall Swing Space"></option>
+			<option value="Woodward (Instructional Resources Centre-IRC)"></option>
 		</datalist>
+		<button id="search">Search</button>
+	</div>
+
 	<body>
 	<table class="table table-striped">
 		<tr  class="bg-info">
@@ -33,4 +88,4 @@
 	</table>
 	</body>
 </html>
-<script src="frontend.js"></script>
+<script type="module" src="frontend.js"></script>
