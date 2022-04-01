@@ -2,6 +2,7 @@ import Server from "../../src/rest/Server";
 import InsightFacade from "../../src/controller/InsightFacade";
 import {expect, use} from "chai";
 import chaiHttp from "chai-http";
+import {getContentFromArchives} from "../TestUtil";
 
 describe("Facade D3", function () {
 
@@ -30,28 +31,27 @@ describe("Facade D3", function () {
 
 	// Sample on how to format PUT requests
 
-	it("PUT test for courses dataset", function () {
-		let SERVER_URL = "",
-			ENDPOINT_URL = "localhost:4321/datasets/courses/courses",
-			ZIP_FILE_DATA = "";
-
-		try {
-			return chai.request(SERVER_URL)
-				.put(ENDPOINT_URL)
-				.send(ZIP_FILE_DATA)
-				.set("Content-Type", "application/x-zip-compressed")
-				.then(function (res: ChaiHttp.Response) {
-					console.log("added dataset: " + facade.addedDatasets);
-					expect(res.status).to.be.equal(200);
-				})
-				.catch(function (err) {
-					// some logging here please!
-					expect.fail();
-				});
-		} catch (err) {
-			// and some more logging here!
-		}
-	});
+	// it("PUT test for courses dataset", function () {
+	// 	let SERVER_URL = "localhost:4321",
+	// 		ENDPOINT_URL = "/dataset/courses/courses",
+	// 		ZIP_FILE_DATA = getContentFromArchives("courses.zip");
+	// 	try {
+	// 		return chai.request(SERVER_URL)
+	// 			.put(ENDPOINT_URL)
+	// 			.send(ZIP_FILE_DATA)
+	// 			.set("Content-Type", "application/x-zip-compressed")
+	// 			.then(function (res: ChaiHttp.Response) {
+	// 				console.log("added dataset: " + facade.addedDatasets);
+	// 				expect(res.status).to.be.equal(200);
+	// 			})
+	// 			.catch(function (err: any) {
+	// 				// some logging here please!
+	// 				expect.fail();
+	// 			});
+	// 	} catch (err) {
+	// 		console.log({error: err});
+	// 	}
+	// });
 
 	// The other endpoints work similarly. You should be able to find all instructions at the chai-http documentation
 });

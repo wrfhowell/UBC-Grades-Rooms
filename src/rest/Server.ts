@@ -139,20 +139,20 @@ export default class Server {
 	private async getDataset (req: Request, res: Response) {
 		try {
 			const currentDatasets = await this.facade.listDatasets();
-			console.log(currentDatasets);
 			res.status(200).json({result: currentDatasets});
 		} catch (err) {
-			console.log({error: err});
+			res.status(400).json({error: err});
 		}
 	}
 
 	private async postQuery (req: Request, res: Response) {
 		try {
 			let query = await JSON.stringify(req.body);
+			if (!query) {
+				res.status(400).json("invalid query hola");
+			}
 			query = await JSON.parse(query);
-			console.log(query);
 			let results = await this.facade.performQuery(query);
-			console.log(results);
 			if (results !== null) {
 				res.status(200).json({results: results});
 			} else {
