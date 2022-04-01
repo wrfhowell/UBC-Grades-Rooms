@@ -151,8 +151,8 @@ describe("Validation", function () {
 
 			it("Should return True - correct wildcards", function() {
 				let obj = {IS: {courses_dept: "*math*"}};
-				let SCompRegEx = new RegExp( "^" + "`*`?[^*]*`*`?$");
-				console.log(SCompRegEx.test("*omg*"));
+				let SCompRegEx = new RegExp( "^[^*]*$");
+				console.log(SCompRegEx.test("omg*"));
 				let x = ValidationObject.ValidateSComparison(obj);
 				expect(x).to.be.true;
 			});
