@@ -52,9 +52,11 @@ export default class HTMLHandler {
 					}).then(() => {
 						// console.log(data.insightDataRooms);
 						return resolve(data.idArray);
-					}).catch(() => {
-						return reject(new InsightError("invalid zip"));
+					}).catch((error: any) => {
+						reject(new InsightError("invalid zip"));
 					});
+			}).catch((error: any) => {
+				reject(new InsightError("invalid zip"));
 			});
 	}
 
