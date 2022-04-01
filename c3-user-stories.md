@@ -10,29 +10,30 @@ As a UBC Student, I want to make queries for courses within my department that h
 #### Definitions of Done(s)
 
 ###### Scenario 1: Valid dataset and query
-**Given:** the user has accessed the web UI of our courses database querier.  
-**When:** The user selects a valid added dataset, and applies various filters on the dataset (such as filtering for specific departments, years offered, sorting, aggregating etc. from dropdown menus) and hits submit.  
+**Given:** the user has accessed the web UI of our courses database querier, and the courses dataset has already been uplaoded to the server.
+**When:** The user selects a valid added dataset, and applies various filters on the dataset (such as filtering for specific departments, course number, year) and hits submit.  
 **Then:** The system outputs the information the user is looking to get as a table.  
 
 ###### Scenario 1: No Dataset selected
-**Given:** the user has accessed the web UI of our courses database querier.  
-**When:** The user applies various filters (such as filtering for specific departments, years offered, sorting, aggregating etc. from dropdown menus) and hits submit without selecting a valid added dataset.  
+**Given:** the user has accessed the web UI of our courses database querierm, and the courses dataset has not been uploaded to the server.
+**When:** The user applies various filters (such as filtering for specific departments, course number, year from dropdown menus) and hits submit.
 **Then:** The system rejects the query and outputs an error message, not allowing the user to submit.  
 
-## User Story 2
-As a system administrator for this web application, I want to be able to add new Course Datasets to the system, so that students can query against the most updated information.  
+## User Story 1
+As a UBC Student, I want to make queries for rooms within a specific building to see if their furniture is suitable for the planned event I am organizing.
 
 
 #### Definitions of Done(s)
-###### Scenario 1: The Dataset added is in JSON format, and is a valid file 
-**Given:** the user has accessed the administor tab of our web UI, and has a valid dataset file stored locally.  
-**When:** the user uploads the valid file into the upload box of our web UI.  
-**Then:** the system loads the valid file into the server followed by a load success message, and now can be accessed by students to perform queries on.  
 
-###### Scenario 2: The Dataset added is not in JSON format, or is an invalid file
-**Given:** the user has accessed the administor tab of our web UI, and has a dataset file stored locally.  
-**When:** the user uploads the invalid file into the upload box of our web UI.  
-**Then:** the system tries to load the invalid file into the server but outputs an error message and prevents the invalid file from being loaded.  
+###### Scenario 1: Valid dataset and query
+**Given:** the user has accessed the web UI of our rooms database querier, and the rooms dataset has already been uploaded to the server.
+**When:** The user chooses a specific building that they want to get rooms information from and hits search.
+**Then:** The system outputs the information the user is looking to get as a table.  
+
+###### Scenario 1: No Dataset selected
+**Given:** the user has accessed the web UI of our rooms database querier, and the rooms dataset has not been uploaded to the server. 
+**When:** The user chooses a specific building that they want to get rooms information from and hits search.
+**Then:** The system rejects the query and outputs an error message, not allowing the user to submit.  
 
 ## Others
 
@@ -46,4 +47,19 @@ As a system administrator for this web application, I want to be able to navigat
 **When:** the user clicks on the link.  
 **Then:** the page changes for the user, allowing for expanded dataset adding capabilities.  
 
+
+## User Story 4
+As a system administrator for this web application, I want to be able to add new Course Datasets to the system, so that students can query against the most updated information.  
+
+
+#### Definitions of Done(s)
+###### Scenario 1: The Dataset added is in JSON format, and is a valid file 
+**Given:** the user has accessed the administor tab of our web UI, and has a valid dataset file stored locally.  
+**When:** the user uploads the valid file into the upload box of our web UI.  
+**Then:** the system loads the valid file into the server followed by a load success message, and now can be accessed by students to perform queries on.  
+
+###### Scenario 2: The Dataset added is not in JSON format, or is an invalid file
+**Given:** the user has accessed the administor tab of our web UI, and has a dataset file stored locally.  
+**When:** the user uploads the invalid file into the upload box of our web UI.  
+**Then:** the system tries to load the invalid file into the server but outputs an error message and prevents the invalid file from being loaded.  
 
