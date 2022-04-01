@@ -132,7 +132,7 @@ export default class Server {
 			let addedDataset = await this.facade.addDataset(id, content, convertedKind);
 			res.status(200).json({result: addedDataset});
 		} catch(err) {
-			res.status(400).json({error: err});
+			res.status(400).json({error: "could not add dataset"});
 		}
 	}
 
@@ -141,7 +141,7 @@ export default class Server {
 			const currentDatasets = await this.facade.listDatasets();
 			res.status(200).json({result: currentDatasets});
 		} catch (err) {
-			res.status(400).json({error: err});
+			res.status(400).json({error: "could not list datasets"});
 		}
 	}
 
@@ -170,11 +170,10 @@ export default class Server {
 			res.status(200).json({result: result});
 		} catch(err: any) {
 			if (err instanceof InsightError) {
-				res.status(400).json({error: err});
+				res.status(400).json({error: "could not delete dataset"});
 			} else if (err instanceof NotFoundError) {
-				res.status(404).json({error: err});
+				res.status(404).json({error: "could not find dataset to delete"});
 			}
-			res.status(400).json({error: err});
 		}
 	}
 }
