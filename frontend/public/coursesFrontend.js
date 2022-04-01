@@ -35,7 +35,7 @@ function getCourseAverage() {
 			],
 			"ORDER": "courses_avg"
 		}
-	}
+	};
 	query.WHERE.AND[0].IS.courses_dept = dept;
 	query.WHERE.AND[1].IS.courses_id = course_num;
 	query.WHERE.AND[2].EQ.courses_year = year;
@@ -43,10 +43,13 @@ function getCourseAverage() {
 	fetch(url, {
 		method: 'POST',
 		body: JSON.stringify(query),
+		headers: {
+			"Content-type": "application/json"
+		}
 	})
 		.then((response) => response.json())
 		.then((retData) => {
-			getAvgFromJson(retData.result);
+			getAvgFromJson(retData.results);
 		})
 		.catch((err) => {
 			console.log(err);
@@ -57,9 +60,15 @@ function getCourseAverage() {
 
 function getAvgFromJson(json) {
 	let total = 0;
-	let amount = json.length;
-	for (let oneAvg of json) {
-		total += oneAvg.courses_avg;
+	let arr = [json];
+	let amount  = arr[0].length
+	console.log(amount);
+	for (let i = 0; i < amount; i++) {
+		let obj = arr[0][i];
+		for (let key in obj) {
+			total += obj[key];
+			console.log(obj[key]);
+		}
 	}
 	avg = total / amount;
 	avg = Math.round(avg * 100) / 100;
@@ -67,5 +76,5 @@ function getAvgFromJson(json) {
 }
 
 function setAverage() {
-	document.getElementById("avg").textContent = "Average: " + avg;
+	document.getElementById("avg").textContent = "Average: " + avg + "%";
 }
