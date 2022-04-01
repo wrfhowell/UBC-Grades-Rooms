@@ -52,9 +52,11 @@ export default class HTMLHandler {
 					}).then(() => {
 						// console.log(data.insightDataRooms);
 						return resolve(data.idArray);
-					}).catch(() => {
-						return reject(new InsightError("invalid zip"));
+					}).catch((error: any) => {
+						reject(new InsightError("invalid zip"));
 					});
+			}).catch((error: any) => {
+				reject(new InsightError("invalid zip"));
 			});
 	}
 
@@ -164,7 +166,7 @@ export default class HTMLHandler {
 		let address: string = building.address;
 		let lat = building.lat;
 		let lon = building.lon;
-		let seats = null;
+		let seats: number = 0;
 		let type = null;
 		let furniture = null;
 		let href = null;
@@ -175,7 +177,8 @@ export default class HTMLHandler {
 					number = td.childNodes[1].childNodes[0].value.trim();
 					href = td.childNodes[1].attrs[0].value.trim();
 				} else if (td.attrs[0].value === "views-field views-field-field-room-capacity") {
-					seats = td.childNodes[0].value.trim();
+					let seatsString = td.childNodes[0].value.trim();
+					seats = +seatsString;
 				} else if (td.attrs[0].value === "views-field views-field-field-room-furniture") {
 					furniture = td.childNodes[0].value.trim();
 				} else if (td.attrs[0].value === "views-field views-field-field-room-type") {
