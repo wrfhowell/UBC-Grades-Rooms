@@ -4,20 +4,20 @@ Make sure to follow the *Role, Goal, Benefit* framework for the user stories and
 ## We are going with a Web UI.
 
 ## User Story 1
-As a UBC Student, I want to make queries for courses within my department that have high averages, so that I know which ones to register for my electives.
+As a UBC Student, I want to make queries for courses within my department to find ones with high averages, so that I know which ones to register for my electives.
 
 
 #### Definitions of Done(s)
 
 ###### Scenario 1: Valid dataset and query
-**Given:** the user has accessed the web UI of our courses database querier, and the courses dataset has already been uplaoded to the server.
+**Given:** the user has accessed the web UI of our courses database querier, and the courses dataset has already been uploaded to the server.
 **When:** The user selects a valid added dataset, and applies various filters on the dataset (such as filtering for specific departments, course number, year) and hits submit.  
-**Then:** The system outputs the information the user is looking to get as a table.  
+**Then:** The system outputs the information the user is looking to get as an average.  
 
-###### Scenario 1: No Dataset selected
-**Given:** the user has accessed the web UI of our courses database querierm, and the courses dataset has not been uploaded to the server.
-**When:** The user applies various filters (such as filtering for specific departments, course number, year from dropdown menus) and hits submit.
-**Then:** The system rejects the query and outputs an error message, not allowing the user to submit.  
+###### Scenario 2: Dataset not loaded
+**Given:** the user has accessed the web UI of our courses database querier, and the courses dataset has not been uploaded to the server.
+**When:** The user applies various filters (such as filtering for specific departments, course number, year) and hits submit.
+**Then:** The system rejects the query, not allowing the user to submit.  
 
 ## User Story 1
 As a UBC Student, I want to make queries for rooms within a specific building to see if their furniture is suitable for the planned event I am organizing.
@@ -30,10 +30,10 @@ As a UBC Student, I want to make queries for rooms within a specific building to
 **When:** The user chooses a specific building that they want to get rooms information from and hits search.
 **Then:** The system outputs the information the user is looking to get as a table.  
 
-###### Scenario 1: No Dataset selected
+###### Scenario 2: Dataset not loaded
 **Given:** the user has accessed the web UI of our rooms database querier, and the rooms dataset has not been uploaded to the server. 
 **When:** The user chooses a specific building that they want to get rooms information from and hits search.
-**Then:** The system rejects the query and outputs an error message, not allowing the user to submit.  
+**Then:** The system rejects the query, not allowing the user to submit.  
 
 ## Others
 
