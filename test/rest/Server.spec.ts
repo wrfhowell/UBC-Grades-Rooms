@@ -2,6 +2,7 @@ import Server from "../../src/rest/Server";
 import InsightFacade from "../../src/controller/InsightFacade";
 import {expect, use} from "chai";
 import chaiHttp from "chai-http";
+import {getContentFromArchives} from "../TestUtil";
 
 describe("Facade D3", function () {
 
@@ -31,9 +32,9 @@ describe("Facade D3", function () {
 	// Sample on how to format PUT requests
 
 	it("PUT test for courses dataset", function () {
-		let SERVER_URL = "",
-			ENDPOINT_URL = "localhost:4321/datasets/courses/courses",
-			ZIP_FILE_DATA = "";
+		let SERVER_URL = "localhost:4321",
+			ENDPOINT_URL = "/datasets/courses/courses",
+			ZIP_FILE_DATA = getContentFromArchives("courses.zip");
 
 		try {
 			return chai.request(SERVER_URL)
