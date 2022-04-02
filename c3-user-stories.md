@@ -1,23 +1,20 @@
-Please edit this template and commit to the master branch for your user stories submission.   
-Make sure to follow the *Role, Goal, Benefit* framework for the user stories and the *Given/When/Then* framework for the Definitions of Done! You can also refer to the examples DoDs in [C3 spec](https://sites.google.com/view/ubc-cpsc310-21w2-intro-to-se/project/checkpoint-3).
-
 ## We are going with a Web UI.
 
 ## User Story 1
-As a UBC Student, I want to make queries for courses within my department to find ones with high averages, so that I know which ones to register for my electives.
+As a UBC Student, I want to make queries for courses within my department and the year of that course to find what the average of all the sections is.
 
 
 #### Definitions of Done(s)
 
 ###### Scenario 1: Valid dataset and query
-**Given:** the user has accessed the web UI of our courses database querier, and the courses dataset has already been uploaded to the server.
-**When:** The user selects a valid added dataset, and applies various filters on the dataset (such as filtering for specific departments, course number, year) and hits submit.  
-**Then:** The system outputs the information the user is looking to get as an average.  
+**Given:** the user has accessed the web UI of our courses database querier, and the courses dataset has already been uploaded to the server, is on the find course average tab.
+**When:** The user inputs into the texts field the course department, the course number, and the course year of the course sections they are interested in finding the average for. 
+**Then:** The system outputs the average of the sections the user queried for - in the form of text below the text fields. 
 
-###### Scenario 2: Dataset not loaded
-**Given:** the user has accessed the web UI of our courses database querier, and the courses dataset has not been uploaded to the server.
-**When:** The user applies various filters (such as filtering for specific departments, course number, year) and hits submit.
-**Then:** The system rejects the query, not allowing the user to submit.  
+###### Scenario 2: Dataset does not contain information about queried course sections
+**Given:** the user has accessed the web UI of our courses database querier, and the courses dataset has already been uploaded to the server, is on the find course average tab.
+**When:** The user inputs into the texts field the course department, the course number, and the course year of the course sections they are interested in finding the average for, but the dataset does not hold any data with these query paramters. 
+**Then:** Text will appears saying "Average: NaN%", to indicate there is no average available.  
 
 ## User Story 1
 As a UBC Student, I want to make queries for rooms within a specific building to see if their furniture is suitable for the planned event I am organizing.
@@ -26,40 +23,12 @@ As a UBC Student, I want to make queries for rooms within a specific building to
 #### Definitions of Done(s)
 
 ###### Scenario 1: Valid dataset and query
-**Given:** the user has accessed the web UI of our rooms database querier, and the rooms dataset has already been uploaded to the server.
-**When:** The user chooses a specific building that they want to get rooms information from and hits search.
-**Then:** The system outputs the information the user is looking to get as a table.  
+**Given:** the user has accessed the web UI of our rooms database querier, and the rooms dataset has already been uploaded to the server. Is on the find rooms tab.
+**When:** The user uses a drop down menu to pick a specific building that they want to get rooms information from and hits a search button.
+**Then:** The system outputs information about rooms in the building in the form of a table. The table displays room name, room furniture, and room address for each room in that building
 
 ###### Scenario 2: Dataset not loaded
 **Given:** the user has accessed the web UI of our rooms database querier, and the rooms dataset has not been uploaded to the server. 
 **When:** The user chooses a specific building that they want to get rooms information from and hits search.
-**Then:** The system rejects the query, not allowing the user to submit.  
-
-## Others
-
-## User Story 3
-As a system administrator for this web application, I want to be able to navigate to a separate page of the website to access add Dataset privileges, so that I can add new Datasets with updated information.  
-
-
-#### Definitions of Done(s)
-###### Scenario 1: The user clicks on the correct link. 
-**Given:** the user navigates to the section of the Web UI that has the link to the admin page.  
-**When:** the user clicks on the link.  
-**Then:** the page changes for the user, allowing for expanded dataset adding capabilities.  
-
-
-## User Story 4
-As a system administrator for this web application, I want to be able to add new Course Datasets to the system, so that students can query against the most updated information.  
-
-
-#### Definitions of Done(s)
-###### Scenario 1: The Dataset added is in JSON format, and is a valid file 
-**Given:** the user has accessed the administor tab of our web UI, and has a valid dataset file stored locally.  
-**When:** the user uploads the valid file into the upload box of our web UI.  
-**Then:** the system loads the valid file into the server followed by a load success message, and now can be accessed by students to perform queries on.  
-
-###### Scenario 2: The Dataset added is not in JSON format, or is an invalid file
-**Given:** the user has accessed the administor tab of our web UI, and has a dataset file stored locally.  
-**When:** the user uploads the invalid file into the upload box of our web UI.  
-**Then:** the system tries to load the invalid file into the server but outputs an error message and prevents the invalid file from being loaded.  
+**Then:** For any building they choose, the results table will be blank (only the headers will be visible for name, furniture, and address)
 
